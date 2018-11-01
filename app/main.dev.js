@@ -11,34 +11,42 @@
  * @flow
  */
 import { app, BrowserWindow } from 'electron';
-import MenuBuilder from './menu';
+
+import fs from 'fs';
+
+const path = require('path');
+
+const { ipcMain } = require('electron');
 
 let mainWindow = null;
+let toolsWindow = null;
 
-if (process.env.NODE_ENV === 'production') {
-  const sourceMapSupport = require('source-map-support');
-  sourceMapSupport.install();
-}
+const a = fs.createWriteStream(path.join(__dirname, '/tmp/clicks.txt'));
 
-if (
-  process.env.NODE_ENV === 'development' ||
-  process.env.DEBUG_PROD === 'true'
-) {
-  require('electron-debug')();
-  const path = require('path');
-  const p = path.join(__dirname, '..', 'app', 'node_modules');
-  require('module').globalPaths.push(p);
-}
+// if (process.env.NODE_ENV === 'production') {
+//   const sourceMapSupport = require('source-map-support');
+//   sourceMapSupport.install();
+// }
 
-const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+// if (
+//   process.env.NODE_ENV === 'development' ||
+//   process.env.DEBUG_PROD === 'true'
+// ) {
+//   require('electron-debug')();
+//   const path = require('path');
+//   const p = path.join(__dirname, '..', 'app', 'node_modules');
+//   require('module').globalPaths.push(p);
+// }
 
-  return Promise.all(
-    extensions.map(name => installer.default(installer[name], forceDownload))
-  ).catch(console.log);
-};
+// const installExtensions = async () => {
+//   const installer = require('electron-devtools-installer');
+//   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+//   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+
+//   return Promise.all(
+//     extensions.map(name => installer.default(installer[name], forceDownload))
+//   ).catch(console.log);
+// };
 
 /**
  * Add event listeners...
@@ -53,39 +61,119 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
-    await installExtensions();
-  }
+  //   if (
+  //     process.env.NODE_ENV === 'development' ||
+  //     process.env.DEBUG_PROD === 'true'
+  //   ) {
+  //     await installExtensions();
+  //   }
 
+  // mainWindow.loadURL('https://ormatek.dev.sibirix.ru');
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728
   });
 
-  mainWindow.loadURL(`file://${__dirname}/app.html`);
+  // mainWindow.loadURL('https://ormatek.dev.sibirix.ru');
+
+  toolsWindow = new BrowserWindow({
+    show: false,
+    width: 1024,
+    height: 728
+  });
+
+  toolsWindow.loadURL(`file://${__dirname}/tools.html`);
+  // mainWindow.loadURL(`http://ya.ru`);
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-  mainWindow.webContents.on('did-finish-load', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
+  toolsWindow.webContents.on('did-finish-load', () => {
+    //   console.log('window loaded');
+    // if (!mainWindow) {
+    //   throw new Error('"mainWindow" is not defined');
+    // }
+    // if (process.env.START_MINIMIZED) {
+    //   mainWindow.minimize();
+    // } else {
+    //       mainWindow.show();
+    //       mainWindow.focus();
+    //     fs.readFile(
+    //         path.join(__dirname, 'script.js'), 'utf8',
+    //         (err: Error, data: string) => {
+    //             const d = data.split('\n').join('\\n ').replace('"', '\\"');
+    //             mainWindow.webContents.executeJavaScript('const script = document.createElement("script")');
+    //             mainWindow.webContents.executeJavaScript('script.setAttribute("type", "text/javascript")');
+    //             mainWindow.webContents.executeJavaScript(`script.innerHTML = "${d}"`);
+    //             // mainWindow.webContents.executeJavaScript(`script.innerHTML = "require('${path.join(__dirname, 'script.js')}')"`);
+    //             mainWindow.webContents.executeJavaScript('document.body.appendChild(script)');
+    //         }
+    //     );
+
+    // }
+    if (!toolsWindow) {
+      throw new Error('"toolsWindow" is not defined');
     }
-    if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
-    } else {
-      mainWindow.show();
-      mainWindow.focus();
-    }
+    // if (process.env.START_MINIMIZED) {
+    //     toolsWindow.minimize();
+    // } else {
+    toolsWindow.show();
+    toolsWindow.focus();
+
+    // }
   });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+    toolsWindow = null;
+  });
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.show();
+
+    console.log('main window loaded');
+    fs.readFile(
+      path.join(__dirname, 'script.js'),
+      'utf8',
+      (err: Error, data: string) => {
+        const d = data
+          .split('\n')
+          .join('\\n ')
+          .replace('"', '\\"');
+        console.log(d);
+        mainWindow.webContents.executeJavaScript(
+          'const script = document.createElement("script")'
+        );
+        mainWindow.webContents.executeJavaScript(
+          'script.setAttribute("type", "text/javascript")'
+        );
+        mainWindow.webContents.executeJavaScript(`script.innerHTML = "${d}"`);
+        // mainWindow.webContents.executeJavaScript(`script.innerHTML = "require('${path.join(__dirname, 'script.js')}')"`);
+        mainWindow.webContents.executeJavaScript(
+          'document.body.appendChild(script)'
+        );
+      }
+    );
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  let argsToString;
+
+  function f(event, args) {
+    argsToString = String(args);
+    a.write(argsToString);
+    a.write('\n');
+  }
+
+  function loadTestingPage(event, args) {
+    // mainWindow.loadURL(args);
+    mainWindow.loadURL(`http://ya.ru`);
+    console.log('testing window opened', args);
+  }
+
+  ipcMain.on('new-mouse-click-event', f);
+  ipcMain.on('new-mouse-drag-event', f);
+  ipcMain.on('new-mouse-dragend-event', f);
+  ipcMain.on('key-pressed', f);
+  ipcMain.on('keydown', f);
+
+  ipcMain.on('new-url-event', loadTestingPage);
 });
