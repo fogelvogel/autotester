@@ -48,11 +48,11 @@ A boilerplate for Scalable Cross-Platform Desktop Apps based on  <a href="http:/
 
 </div>
 
-<div align="center">
+<!-- <div align="center">
 
 ![Electron Boilerplate Demo](https://cloud.githubusercontent.com/assets/3382565/10557547/b1f07a4e-74e3-11e5-8d27-79ab6947d429.gif)
 
-</div>
+</div> -->
 
 ## Install
 
@@ -61,7 +61,7 @@ A boilerplate for Scalable Cross-Platform Desktop Apps based on  <a href="http:/
 First, clone the repo via git:
 
 ```bash
-git clone --depth=1 https://github.com/electron-react-boilerplate/electron-react-boilerplate.git your-project-name
+git clone --depth=1 https://github.com/fogelvogel/electron-react-boilerplate.git your-project-name
 ```
 
 And then install dependencies with yarn.
@@ -206,19 +206,18 @@ Then, use git to merge some latest commits:
 git pull upstream master
 ```
 
-## Maintainers
+<!-- ## Maintainers
 
 - [Vikram Rangaraj](https://github.com/vikr01)
 - [Amila Welihinda](https://github.com/amilajack)
 - [C. T. Lin](https://github.com/chentsulin)
-- [Jhen-Jie Hong](https://github.com/jhen0409)
+- [Jhen-Jie Hong](https://github.com/jhen0409) -->
 
+<!-- ## Backers
 
-## Backers
+Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/electron-react-boilerplate#backer)] -->
 
-Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/electron-react-boilerplate#backer)]
-
-<a href="https://opencollective.com/electron-react-boilerplate/backer/0/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/backer/0/avatar.svg"></a>
+<!-- <a href="https://opencollective.com/electron-react-boilerplate/backer/0/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/backer/0/avatar.svg"></a>
 <a href="https://opencollective.com/electron-react-boilerplate/backer/1/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/backer/1/avatar.svg"></a>
 <a href="https://opencollective.com/electron-react-boilerplate/backer/2/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/backer/2/avatar.svg"></a>
 <a href="https://opencollective.com/electron-react-boilerplate/backer/3/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/backer/3/avatar.svg"></a>
@@ -282,7 +281,7 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 <a href="https://opencollective.com/electron-react-boilerplate/sponsor/26/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/sponsor/26/avatar.svg"></a>
 <a href="https://opencollective.com/electron-react-boilerplate/sponsor/27/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/sponsor/27/avatar.svg"></a>
 <a href="https://opencollective.com/electron-react-boilerplate/sponsor/28/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/sponsor/28/avatar.svg"></a>
-<a href="https://opencollective.com/electron-react-boilerplate/sponsor/29/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/sponsor/29/avatar.svg"></a>
+<a href="https://opencollective.com/electron-react-boilerplate/sponsor/29/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/sponsor/29/avatar.svg"></a> -->
 
 ## License
 
