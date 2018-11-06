@@ -7,7 +7,8 @@ export default function home(state = initialState, action: Action) {
     case SAVE_TESTING_URL: {
       console.log('URL saved');
       return Object.assign({}, state, {
-        url: action.url
+        url: action.url,
+        mode: 1
       });
     }
     default:

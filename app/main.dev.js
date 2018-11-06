@@ -13,6 +13,7 @@
 import { app, BrowserWindow } from 'electron';
 
 import fs from 'fs';
+import { addTestString, deletePrevious } from './actions/testBodyActions';
 // import getPath from './helpers';
 
 const path = require('path');
@@ -134,15 +135,29 @@ app.on('ready', async () => {
   });
 
   // let argsToString;
+  function buildTestString(type: string, params: string) {
+    const splittedParams = params.split(' ');
+    const newPaths = splittedParams[0].split('#');
+    const newAttributes = splittedParams.shift();
+    const newString = {
+      actionName: type,
+      paths: newPaths,
+      attributes: newAttributes
+    };
+    return newString;
+  }
 
   function clickFunction(event, args) {
     console.log('click', args);
-
+    console.log('delay 1000');
+    buildTestString('click', args);
+    addTestString();
     // a.write(`click ${args}\n`);
   }
   function doubleclickFunction(event, args) {
-    // после этого нужно удалить две предыдущие записи о кликах
+    deletePrevious();
     console.log('click', args);
+    console.log('delay 1000');
 
     // a.write(`click ${args}\n`);
   }

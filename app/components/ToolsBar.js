@@ -16,40 +16,45 @@ export default class ToolsBar extends Component<Props> {
 
     return (
       <div>
-        <div className={styles.btnGroup}>
-          <button
-            className={styles.btn}
-            onClick={waitForElement}
-            data-tclass="btn"
-            type="button"
-          >
-            <i className="button wait" />
-          </button>
-          <button
-            className={styles.btn}
-            onClick={fixData}
-            data-tclass="btn"
-            type="button"
-          >
-            <i className="button fix" />
-          </button>
-          <button
-            className={styles.btn}
-            onClick={doTestAction}
-            data-tclass="btn"
-            type="button"
-          >
-            <i className="button test" />
-          </button>
+        <div>
+          <div id="testField">test body</div>
+        </div>
+        <div>
+          <div className={styles.btnGroup}>
+            <button
+              className={styles.btn}
+              onClick={waitForElement}
+              data-tclass="btn"
+              type="button"
+            >
+              <i className="button wait" />
+            </button>
+            <button
+              className={styles.btn}
+              onClick={fixData}
+              data-tclass="btn"
+              type="button"
+            >
+              <i className="button fix" />
+            </button>
+            <button
+              className={styles.btn}
+              onClick={doTestAction}
+              data-tclass="btn"
+              type="button"
+            >
+              <i className="button test" />
+            </button>
 
-          <button
-            className={styles.btn}
-            onClick={resizeWindow}
-            data-tclass="btn"
-            type="button"
-          >
-            <i className="button resize" />
-          </button>
+            <button
+              className={styles.btn}
+              onClick={resizeWindow}
+              data-tclass="btn"
+              type="button"
+            >
+              <i className="button resize" />
+            </button>
+          </div>
         </div>
       </div>
     );
