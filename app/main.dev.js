@@ -22,7 +22,7 @@ const { ipcMain } = require('electron');
 let mainWindow = null;
 let toolsWindow = null;
 
-const a = fs.createWriteStream(path.join(__dirname, '/tmp/clicks.txt'));
+// const a = fs.createWriteStream(path.join(__dirname, '/tmp/clicks.txt'));
 
 // if (process.env.NODE_ENV === 'production') {
 //   const sourceMapSupport = require('source-map-support');
@@ -138,7 +138,13 @@ app.on('ready', async () => {
   function clickFunction(event, args) {
     console.log('click', args);
 
-    a.write(`click ${args}\n`);
+    // a.write(`click ${args}\n`);
+  }
+  function doubleclickFunction(event, args) {
+    // после этого нужно удалить две предыдущие записи о кликах
+    console.log('click', args);
+
+    // a.write(`click ${args}\n`);
   }
 
   function loadTestingPage(event, args) {
@@ -148,6 +154,7 @@ app.on('ready', async () => {
   }
 
   ipcMain.on('new-mouse-click-event', clickFunction);
+  ipcMain.on('new-mouse-doubleclick-event', doubleclickFunction);
 
   ipcMain.on('keydown', clickFunction);
 

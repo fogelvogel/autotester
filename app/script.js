@@ -42,12 +42,25 @@ function getPathTo(element) {
 console.log('this script was injected');
 
 window.onclick = e => {
+  // TODO: посылать сообщение только если прога находится во втором состоянии
   if (e.eventPhase === 3) {
     let tmp = getPathTo(e.target);
-    const params = `par1 par2`;
+    const params = `left`;
     tmp = `${tmp} ${params}`;
     ipc.send('new-mouse-click-event', tmp);
   }
+};
+window.ondblclick = e => {
+  let tmp = getPathTo(e.target);
+  const params = `left double`;
+  tmp = `${tmp} ${params}`;
+  ipc.send('new-mouse-doubleclick-event', tmp);
+};
+window.onresize = e => {
+  console.log(e.detail);
+};
+window.onscroll = e => {
+  console.log(e.detail);
 };
 // window.onclick = (e) => {
 //     if (e.target === document.body) {
