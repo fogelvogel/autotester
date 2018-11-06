@@ -13,6 +13,7 @@
 import { app, BrowserWindow } from 'electron';
 
 import fs from 'fs';
+// import getPath from './helpers';
 
 const path = require('path');
 
@@ -61,12 +62,12 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
-  //   if (
-  //     process.env.NODE_ENV === 'development' ||
-  //     process.env.DEBUG_PROD === 'true'
-  //   ) {
-  //     await installExtensions();
-  //   }
+  // if (
+  //   process.env.NODE_ENV === 'development' ||
+  //   process.env.DEBUG_PROD === 'true'
+  // ) {
+  //   await installExtensions();
+  // }
 
   // mainWindow.loadURL('https://ormatek.dev.sibirix.ru');
   mainWindow = new BrowserWindow({
@@ -89,28 +90,6 @@ app.on('ready', async () => {
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   toolsWindow.webContents.on('did-finish-load', () => {
-    //   console.log('window loaded');
-    // if (!mainWindow) {
-    //   throw new Error('"mainWindow" is not defined');
-    // }
-    // if (process.env.START_MINIMIZED) {
-    //   mainWindow.minimize();
-    // } else {
-    //       mainWindow.show();
-    //       mainWindow.focus();
-    //     fs.readFile(
-    //         path.join(__dirname, 'script.js'), 'utf8',
-    //         (err: Error, data: string) => {
-    //             const d = data.split('\n').join('\\n ').replace('"', '\\"');
-    //             mainWindow.webContents.executeJavaScript('const script = document.createElement("script")');
-    //             mainWindow.webContents.executeJavaScript('script.setAttribute("type", "text/javascript")');
-    //             mainWindow.webContents.executeJavaScript(`script.innerHTML = "${d}"`);
-    //             // mainWindow.webContents.executeJavaScript(`script.innerHTML = "require('${path.join(__dirname, 'script.js')}')"`);
-    //             mainWindow.webContents.executeJavaScript('document.body.appendChild(script)');
-    //         }
-    //     );
-
-    // }
     if (!toolsWindow) {
       throw new Error('"toolsWindow" is not defined');
     }
@@ -119,8 +98,6 @@ app.on('ready', async () => {
     // } else {
     toolsWindow.show();
     toolsWindow.focus();
-
-    // }
   });
 
   mainWindow.on('closed', () => {
@@ -131,6 +108,7 @@ app.on('ready', async () => {
     mainWindow.show();
 
     console.log('main window loaded');
+
     fs.readFile(
       path.join(__dirname, 'script.js'),
       'utf8',
@@ -158,6 +136,7 @@ app.on('ready', async () => {
   let argsToString;
 
   function f(event, args) {
+    console.log('click', args);
     argsToString = String(args);
     a.write(argsToString);
     a.write('\n');
@@ -176,4 +155,7 @@ app.on('ready', async () => {
   ipcMain.on('keydown', f);
 
   ipcMain.on('new-url-event', loadTestingPage);
+  //   ipcMain.on('give-me-the-function', () => {
+  //       mainWindow.webContents.send('ready-to-write-clicks', getPath);
+  //   });
 });
