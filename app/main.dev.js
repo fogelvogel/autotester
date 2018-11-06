@@ -133,13 +133,12 @@ app.on('ready', async () => {
     );
   });
 
-  let argsToString;
+  // let argsToString;
 
-  function f(event, args) {
+  function clickFunction(event, args) {
     console.log('click', args);
-    argsToString = String(args);
-    a.write(argsToString);
-    a.write('\n');
+
+    a.write(`click ${args}\n`);
   }
 
   function loadTestingPage(event, args) {
@@ -148,11 +147,9 @@ app.on('ready', async () => {
     console.log('testing window opened', args);
   }
 
-  ipcMain.on('new-mouse-click-event', f);
-  ipcMain.on('new-mouse-drag-event', f);
-  ipcMain.on('new-mouse-dragend-event', f);
-  ipcMain.on('key-pressed', f);
-  ipcMain.on('keydown', f);
+  ipcMain.on('new-mouse-click-event', clickFunction);
+
+  ipcMain.on('keydown', clickFunction);
 
   ipcMain.on('new-url-event', loadTestingPage);
   //   ipcMain.on('give-me-the-function', () => {

@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import routes from '../constants/routes';
 import styles from './Home.css';
+// import * as Helper from '../helpers';
 
 const ipc = require('electron').ipcRenderer;
 
@@ -18,8 +19,11 @@ export default class Home extends Component<Props> {
   };
 
   saveTestingURl = () => {
-    console.log(this.input.value);
+    // if (Helper.checkField(this.input.value)) {
     ipc.send('new-url-event', this.input.value);
+    // } else {
+    //   console.log('value in field is invalid');
+    // }
   };
 
   render() {
