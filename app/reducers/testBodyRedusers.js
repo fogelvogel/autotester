@@ -20,6 +20,7 @@ export default function addStringReduser(state = initialState, action: Action) {
       console.log('test string was deleted');
       const newTestBody = state.testBody;
       newTestBody.pop();
+      newTestBody.pop();
       return Object.assign({}, state, {
         testBody: newTestBody
       });

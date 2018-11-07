@@ -4,15 +4,14 @@ import styles from './Counter.css';
 type Props = {
   waitForElement: () => void,
   fixData: () => void,
-  doTestAction: () => void,
-  resizeWindow: () => void
+  doTestAction: () => void
 };
 
 export default class ToolsBar extends Component<Props> {
   props: Props;
 
   render() {
-    const { waitForElement, fixData, doTestAction, resizeWindow } = this.props;
+    const { waitForElement, fixData, doTestAction } = this.props;
 
     return (
       <div>
@@ -44,15 +43,6 @@ export default class ToolsBar extends Component<Props> {
               type="button"
             >
               <i className="button test" />
-            </button>
-
-            <button
-              className={styles.btn}
-              onClick={resizeWindow}
-              data-tclass="btn"
-              type="button"
-            >
-              <i className="button resize" />
             </button>
           </div>
         </div>

@@ -1,8 +1,7 @@
 import {
   WAIT_FOR_ELEMENT,
   FIX_DATA,
-  DO_TEST_ACTION,
-  RESIZE_WINDOW
+  DO_TEST_ACTION
 } from '../actions/toolsBar';
 import type { Action } from './types';
 import initialState from '../initialState';
@@ -21,10 +20,6 @@ export default function toolBar(state = initialState, action: Action) {
     }
     case DO_TEST_ACTION: {
       console.log('doTestAction');
-      return state;
-    }
-    case RESIZE_WINDOW: {
-      console.log('resizeWindow');
       return state;
     }
     default:
