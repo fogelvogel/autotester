@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as toolsActions from '../actions/toolsBar';
 import * as testActions from '../actions/testBodyActions';
 import ToolsBar from '../components/ToolsBar';
+import TestTable from '../components/TestTable';
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
@@ -14,7 +15,7 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   () => ({}),
   mapDispatchToProps
-)(ToolsBar);
+)(ToolsBar, TestTable);
 // const mapDispatchToProps = {
 //   ...toolsActions,
 //   ...testActions
