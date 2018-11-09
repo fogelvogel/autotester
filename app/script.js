@@ -25,20 +25,6 @@ function getPathTo(element) {
     }
   }
 }
-// let getPath = null;
-
-// ipc.on('ready-to-write-clicks', (event, args) => {
-//     console.log('ipcRenderer');
-//     getPath = args;
-//     console.log(event);
-//     console.log(args);
-// });
-
-// function getFunction(message) {
-//     console.log('ipcRenderer');
-// getPath = message;
-// }
-
 console.log('this script was injected');
 
 window.onclick = e => {
@@ -62,11 +48,6 @@ window.onresize = e => {
 window.onscroll = e => {
   console.log(e.detail);
 };
-// window.onclick = (e) => {
-//     if (e.target === document.body) {
-//        console.log(e.target, document.body);
-//     }
-// };
-window.onkeydown = function(e) {
+window.onkeydown = e => {
   ipc.send('keydown', e.key);
 };

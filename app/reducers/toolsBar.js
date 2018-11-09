@@ -4,21 +4,24 @@ import {
   DO_TEST_ACTION
 } from '../actions/toolsBar';
 import type { Action } from './types';
-import initialState from '../initialState';
 
-export default function toolBar(state = initialState, action: Action) {
+export default function toolBar(state = 0, action: Action) {
+  let newMode;
   switch (action.type) {
     case WAIT_FOR_ELEMENT: {
-      return state;
+      newMode = 2;
+      break;
     }
-
     case FIX_DATA: {
-      return state;
+      newMode = 3;
+      break;
     }
     case DO_TEST_ACTION: {
-      return state;
+      newMode = 4;
+      break;
     }
     default:
       return state;
   }
+  return newMode;
 }

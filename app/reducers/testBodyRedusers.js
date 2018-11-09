@@ -4,33 +4,17 @@ import {
   CLEAR_TEST
 } from '../actions/testBodyActions';
 import type { Action } from './types';
-import initialState from '../initialState';
 
-export default function addStringReduser(state = initialState, action: Action) {
+export default function addStringReduser(state = [], action: Action) {
   switch (action.type) {
     case ADD_TEST_STRING: {
-      console.log('test string was added');
-      const newTestBody = state.testBody;
-      newTestBody.push(action.newString);
-      return Object.assign({}, state, {
-        testBody: newTestBody
-      });
+      return [...state, action.newString];
     }
     case DELETE_PREVIOUS: {
-      console.log('test string was deleted');
-      const newTestBody = state.testBody;
-      newTestBody.pop();
-      newTestBody.pop();
-      return Object.assign({}, state, {
-        testBody: newTestBody
-      });
+      return [...state].pop();
     }
     case CLEAR_TEST: {
-      console.log('test was deleted');
-      const newTestBody = [];
-      return Object.assign({}, state, {
-        testBody: newTestBody
-      });
+      return [];
     }
     default:
       return state;
