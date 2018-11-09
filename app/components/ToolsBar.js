@@ -16,7 +16,7 @@ export default class ToolsBar extends Component<Props> {
     return (
       <div>
         <div>
-          <div id="testField">test body</div>
+          <div id="testField">{console.log(this.props)}</div>
         </div>
         <div>
           <div className={styles.btnGroup}>
