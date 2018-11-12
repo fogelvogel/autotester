@@ -33,6 +33,7 @@ window.onclick = e => {
     let tmp = getPathTo(e.target);
     const params = `left`;
     tmp = `${tmp} ${params}`;
+
     ipc.send('new-mouse-click-event', tmp);
   }
 };

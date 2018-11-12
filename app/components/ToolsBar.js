@@ -1,18 +1,29 @@
 import React, { Component } from 'react';
 import styles from './Counter.css';
 import { saveTestToFile } from '../helpers';
-import * as confStore from '../store/configureStore';
+// import * as confStore from '../store/configureStore';
+import { addTestString } from '../actions/testBodyActions';
+import * as initial from '../initialState';
 
+const ipc = require('electron').ipcRenderer;
+
+ipc.on('new test string available', addString);
 type Props = {
   waitForElement: () => void,
   fixData: () => void,
   doTestAction: () => void,
   clearTest: () => void
 };
-const store = confStore.configureStore();
+// // const store = confStore.configureStore();
+const store = initial.getStore();
+
 const state = store.getState();
+
 function helpingFunction() {
   saveTestToFile(state);
+}
+function addString(event, args) {
+  store.dispatch(addTestString(args));
 }
 
 export default class ToolsBar extends Component<Props> {
@@ -24,8 +35,13 @@ export default class ToolsBar extends Component<Props> {
     return (
       <div>
         <div>
-          <div id="testField">{console.log(this.props)}</div>
+          <div id="testField">{console.log('props', this.props)}</div>
         </div>
+        {/* <ul>
+            {
+                state.testBody.map((v) => <li>{v.actionName}</li>)
+            }
+        </ul> */}
         <div>
           <div className={styles.btnGroup}>
             <button

@@ -11,7 +11,9 @@ export default function addStringReduser(state = [], action: Action) {
       return [...state, action.newString];
     }
     case DELETE_PREVIOUS: {
-      return [...state].pop();
+      const newState = [...state];
+      newState.pop();
+      return newState;
     }
     case CLEAR_TEST: {
       return [];
