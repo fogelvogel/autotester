@@ -9,15 +9,15 @@ export default function toolBar(state = 0, action: Action) {
   let newMode;
   switch (action.type) {
     case WAIT_FOR_ELEMENT: {
-      newMode = 2;
+      newMode = 1;
       break;
     }
     case FIX_DATA: {
-      newMode = 3;
+      newMode = 2;
       break;
     }
     case DO_TEST_ACTION: {
-      newMode = 4;
+      newMode = 3;
       break;
     }
     default:

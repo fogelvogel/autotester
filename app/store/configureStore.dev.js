@@ -4,7 +4,7 @@ import { createHashHistory } from 'history';
 import { routerMiddleware, routerActions } from 'connected-react-router';
 import { createLogger } from 'redux-logger';
 import createRootReducer from '../reducers';
-import * as counterActions from '../actions/counter';
+// import * as counterActions from '../actions/counter';
 import * as toolsActions from '../actions/toolsBar';
 import * as homeActions from '../actions/home';
 import * as testBodyActions from '../actions/testBodyActions';
@@ -41,7 +41,6 @@ const configureStore = (initialState?: autotesterStateType) => {
   // Redux DevTools Configuration
   const actionCreators = {
     ...toolsActions,
-    ...counterActions,
     ...routerActions,
     ...homeActions,
     ...testBodyActions

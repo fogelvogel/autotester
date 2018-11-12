@@ -26,6 +26,7 @@ export default class ToolsBar extends Component<Props> {
               data-tclass="btn"
               type="button"
             >
+              wait
               <i className="button wait" />
             </button>
             <button
@@ -34,6 +35,7 @@ export default class ToolsBar extends Component<Props> {
               data-tclass="btn"
               type="button"
             >
+              fix
               <i className="button fix" />
             </button>
             <button
@@ -42,6 +44,7 @@ export default class ToolsBar extends Component<Props> {
               data-tclass="btn"
               type="button"
             >
+              test
               <i className="button test" />
             </button>
           </div>
