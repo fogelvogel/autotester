@@ -1,17 +1,25 @@
 import React, { Component } from 'react';
 import styles from './Counter.css';
+import { saveTestToFile } from '../helpers';
+import * as confStore from '../store/configureStore';
 
 type Props = {
   waitForElement: () => void,
   fixData: () => void,
-  doTestAction: () => void
+  doTestAction: () => void,
+  clearTest: () => void
 };
+const store = confStore.configureStore();
+const state = store.getState();
+function helpingFunction() {
+  saveTestToFile(state);
+}
 
 export default class ToolsBar extends Component<Props> {
   props: Props;
 
   render() {
-    const { waitForElement, fixData, doTestAction } = this.props;
+    const { waitForElement, fixData, doTestAction, clearTest } = this.props;
 
     return (
       <div>
@@ -27,7 +35,6 @@ export default class ToolsBar extends Component<Props> {
               type="button"
             >
               wait
-              <i className="button wait" />
             </button>
             <button
               className={styles.btn}
@@ -36,7 +43,6 @@ export default class ToolsBar extends Component<Props> {
               type="button"
             >
               fix
-              <i className="button fix" />
             </button>
             <button
               className={styles.btn}
@@ -45,7 +51,24 @@ export default class ToolsBar extends Component<Props> {
               type="button"
             >
               test
-              <i className="button test" />
+            </button>
+          </div>
+          <div>
+            <button
+              className={styles.btn}
+              onClick={clearTest}
+              data-tclass="btn"
+              type="button"
+            >
+              clear test
+            </button>
+            <button
+              className={styles.btn}
+              onClick={helpingFunction}
+              data-tclass="btn"
+              type="button"
+            >
+              save test
             </button>
           </div>
         </div>
