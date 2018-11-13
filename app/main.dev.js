@@ -118,7 +118,6 @@ app.on('ready', async () => {
           .split('\n')
           .join('\\n ')
           .replace('"', '\\"');
-        console.log(d);
         mainWindow.webContents.executeJavaScript(
           'const script = document.createElement("script")'
         );
@@ -140,7 +139,6 @@ app.on('ready', async () => {
     const newPaths = splittedParams[0].split('#');
     const newAttributes = [...splittedParams];
     newAttributes.shift();
-    console.log(newAttributes);
     const newString = {
       actionName: type,
       paths: newPaths,

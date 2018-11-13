@@ -17,9 +17,8 @@ type Props = {
 // // const store = confStore.configureStore();
 const store = initial.getStore();
 
-const state = store.getState();
-
 function helpingFunction() {
+  const state = store.getState();
   saveTestToFile(state);
 }
 function addString(event, args) {
