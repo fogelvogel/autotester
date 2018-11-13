@@ -5,12 +5,11 @@ import * as testActions from '../actions/testBodyActions';
 import ToolsBar from '../components/ToolsBar';
 // import TestTable from '../components/TestTable';
 
-// function mapStateToProps(state) {
-//   return {
-//     mode: state.mode,
-//     testBody: state.testBody
-//   };
-// }
+function mapStateToProps(state) {
+  return {
+    testBody: state.testBody
+  };
+}
 function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     Object.assign({}, testActions, toolsActions),
@@ -19,7 +18,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(
-  () => ({}),
-  // mapStateToProps,
+  mapStateToProps,
   mapDispatchToProps
 )(ToolsBar);

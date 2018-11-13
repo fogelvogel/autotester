@@ -108,8 +108,6 @@ app.on('ready', async () => {
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
 
-    console.log('main window loaded');
-
     fs.readFile(
       path.join(__dirname, 'script.js'),
       'utf8',
@@ -146,38 +144,36 @@ app.on('ready', async () => {
     };
     return newString;
   }
-  function buildDelayTestString(params: string = '') {
-    let atr = params;
-    if (params === '') {
-      atr = '1000';
-    }
-    const newString = {
-      actionName: 'delay',
-      paths: null,
-      attributes: [atr]
-    };
-    return newString;
-  }
+  // function buildDelayTestString(params: string = '') {
+  //   let atr = params;
+  //   if (params === '') {
+  //     atr = '1000';
+  //   }
+  //   const newString = {
+  //     actionName: 'delay',
+  //     paths: null,
+  //     attributes: [atr]
+  //   };
+  //   return newString;
+  // }
 
   function clickFunction(event, args) {
     const testString = buildTestString('click', args);
-    const testDelayString = buildDelayTestString();
+    // const testDelayString = buildDelayTestString();
     // addTestString(testString);
     toolsWindow.webContents.send('new test string available', testString);
-    toolsWindow.webContents.send('new test string available', testDelayString);
+    // toolsWindow.webContents.send('new test string available', testDelayString);
     // toolsWindow.webContents.send('new test string available', 'delay 1000\n');
-    // addTestString('delay 1000');
     // a.write(`click ${args}\n`);
   }
 
   function doubleclickFunction(event, args) {
     toolsWindow.webContents.send('need to delete previous two');
-    const testDelayString = buildDelayTestString();
-    // deletePrevious();
+    // const testDelayString = buildDelayTestString();
+
     const testString = buildTestString('click', args);
-    // addTestString(testString);
     toolsWindow.webContents.send('new test string available', testString);
-    toolsWindow.webContents.send('new test string available', testDelayString);
+    // toolsWindow.webContents.send('new test string available', testDelayString);
     // addTestString('delay 1000');
 
     // a.write(`click ${args}\n`);
