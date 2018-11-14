@@ -14,6 +14,7 @@ type Props = {
   fixData: () => void,
   doTestAction: () => void,
   clearTest: () => void,
+  deleteOneString: () => void,
   testBody: []
 };
 // // const store = confStore.configureStore();
@@ -35,12 +36,15 @@ function addString(event, args) {
 export default class ToolsBar extends Component<Props> {
   props: Props;
 
+  currentDeleting = null;
+
   render() {
     const {
       waitForElement,
       fixData,
       doTestAction,
       clearTest,
+      deleteOneString,
       testBody
     } = this.props;
 
@@ -50,8 +54,21 @@ export default class ToolsBar extends Component<Props> {
           <div id="testField">Your test is here:</div>
         </div>
         <ul>
-          {testBody.map(v => (
-            <li>{`${v.actionName} | ${v.attributes}`}</li>
+          {testBody.map((v, index) => (
+            <div>
+              <p>{index + 1}</p>
+              <li>{`${v.actionName} | ${v.attributes}`}</li>
+              <button
+                className={styles.btn}
+                onClick={() => {
+                  deleteOneString(index + 1);
+                }}
+                data-tclass="btn"
+                type="button"
+              >
+                delete string
+              </button>
+            </div>
           ))}
         </ul>
         <div>
