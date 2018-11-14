@@ -50,5 +50,9 @@ window.onscroll = e => {
   console.log(e.detail);
 };
 window.onkeydown = e => {
-  ipc.send('keydown', e.key);
+  let tmp = getPathTo(e.target);
+  const params = e.key;
+  tmp = `${tmp} ${params}`;
+
+  ipc.send('keydown', tmp);
 };
