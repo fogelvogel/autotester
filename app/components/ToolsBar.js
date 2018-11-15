@@ -7,6 +7,9 @@ import * as initial from '../initialState';
 
 const ipc = require('electron').ipcRenderer;
 
+let wait = null;
+let exists = null;
+
 ipc.on('need to delete previous two', deletePreviousTwo);
 ipc.on('new test string available', addString);
 
@@ -42,9 +45,14 @@ function addString(event, args) {
     });
     store.dispatch(addTestString(newArgs));
   } else if (state.mode === 1) {
+    let waitValue = wait.value;
+    if (!waitValue) {
+      waitValue = '5000';
+    }
+    const existValue = exists.checked;
     const newArgs = Object.assign({}, args, {
       actionName: 'wait',
-      attributes: ['notexists', '5000']
+      attributes: [existValue, waitValue]
     });
     store.dispatch(addTestString(newArgs));
   }
@@ -166,10 +174,16 @@ function DrawAdditionalFields(props) {
   const setDelay = el => {
     input = el;
   };
+  const setWait = el => {
+    wait = el;
+  };
+
+  const setExists = el => {
+    exists = el;
+  };
 
   const addDelayString = () => {
     let delayValue = input.value;
-    console.log('aaaaaaa', input.value);
     if (!delayValue) {
       delayValue = '1000';
     }
@@ -194,10 +208,10 @@ function DrawAdditionalFields(props) {
           </button>
           <h3>or</h3>
           <label htmlFor="isExisting">
-            <input type="checkbox" name="isExisting" />
+            <input type="checkbox" name="isExisting" ref={setExists} />
             element exists
           </label>
-          <input type="text" placeholder="5000" />
+          <input type="text" placeholder="5000" ref={setWait} />
           <div>
             <p>
               if you want to wait for some element to exist pick an element by
