@@ -9,6 +9,7 @@ const ipc = require('electron').ipcRenderer;
 
 ipc.on('need to delete previous two', deletePreviousTwo);
 ipc.on('new test string available', addString);
+
 type Props = {
   waitForElement: () => void,
   fixData: () => void,
@@ -31,7 +32,22 @@ function deletePreviousTwo() {
   store.dispatch(deletePrevious());
 }
 function addString(event, args) {
-  store.dispatch(addTestString(args));
+  state = store.getState();
+  if (state.mode === 2) {
+    store.dispatch(addTestString(args));
+  } else if (state.mode === 3) {
+    const newArgs = Object.assign({}, args, {
+      actionName: 'test',
+      attributes: ['text']
+    });
+    store.dispatch(addTestString(newArgs));
+  } else if (state.mode === 1) {
+    const newArgs = Object.assign({}, args, {
+      actionName: 'wait',
+      attributes: ['notexists', '5000']
+    });
+    store.dispatch(addTestString(newArgs));
+  }
 }
 
 export default class ToolsBar extends Component<Props> {
@@ -158,12 +174,11 @@ function DrawAdditionalFields(props) {
             <input type="checkbox" name="isExisting" />
             element exists
           </label>
-          <input type="text" placeholder="Waiting time in ms" />
-          <button type="button">Add waiting</button>
+          <input type="text" value="5000" />
           <div>
             <p>
-              if you want to wait for some element to exist, click this button
-              and pick element by your cursor
+              if you want to wait for some element to exist pick an element by
+              your cursor
             </p>
           </div>
         </div>
@@ -182,7 +197,7 @@ function DrawAdditionalFields(props) {
         <div>
           <h3>Test some values</h3>
           <label htmlFor="text">
-            <input type="checkbox" name="text" />
+            <input type="checkbox" name="text" checked="checked" />
             Text
           </label>
           <label htmlFor="size">
