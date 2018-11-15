@@ -160,6 +160,27 @@ export default class ToolsBar extends Component<Props> {
 }
 function DrawAdditionalFields(props) {
   const currMode = props.mode;
+
+  let input = null;
+
+  const setDelay = el => {
+    input = el;
+  };
+
+  const addDelayString = () => {
+    let delayValue = input.value;
+    console.log('aaaaaaa', input.value);
+    if (!delayValue) {
+      delayValue = '1000';
+    }
+    store.dispatch(
+      addTestString({
+        actionName: 'wait',
+        attributes: [delayValue],
+        paths: []
+      })
+    );
+  };
   switch (currMode) {
     case 1: {
       return (
@@ -167,14 +188,16 @@ function DrawAdditionalFields(props) {
           <h3>
             Type delay in milliseconds or pick element, that needs to be wated
           </h3>
-          <input type="text" placeholder="Type delay in ms" />
-          <button type="button">Add delay</button>
+          <input type="text" placeholder="1000" ref={setDelay} />
+          <button type="button" onClick={addDelayString}>
+            Add delay
+          </button>
           <h3>or</h3>
           <label htmlFor="isExisting">
             <input type="checkbox" name="isExisting" />
             element exists
           </label>
-          <input type="text" value="5000" />
+          <input type="text" placeholder="5000" />
           <div>
             <p>
               if you want to wait for some element to exist pick an element by
