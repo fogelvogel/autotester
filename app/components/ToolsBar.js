@@ -9,6 +9,14 @@ const ipc = require('electron').ipcRenderer;
 
 let wait = null;
 let exists = null;
+const toTest = [];
+const namesOfTestingAttributes = [
+  'text',
+  'size',
+  'classes',
+  'quantity',
+  'focus'
+];
 
 ipc.on('need to delete previous two', deletePreviousTwo);
 ipc.on('new test string available', addString);
@@ -39,9 +47,15 @@ function addString(event, args) {
   if (state.mode === 2) {
     store.dispatch(addTestString(args));
   } else if (state.mode === 3) {
+    const arrToTest = [];
+    for (let i = 0; i < 5; i += 1) {
+      if (toTest[i].checked) {
+        arrToTest.push(namesOfTestingAttributes[i]);
+      }
+    }
     const newArgs = Object.assign({}, args, {
       actionName: 'test',
-      attributes: ['text']
+      attributes: arrToTest
     });
     store.dispatch(addTestString(newArgs));
   } else if (state.mode === 1) {
@@ -182,6 +196,25 @@ function DrawAdditionalFields(props) {
     exists = el;
   };
 
+  const setText = el => {
+    toTest[0] = el;
+  };
+
+  const setSize = el => {
+    toTest[1] = el;
+  };
+
+  const setClasses = el => {
+    toTest[2] = el;
+  };
+
+  const setQuantity = el => {
+    toTest[3] = el;
+  };
+
+  const setFocus = el => {
+    toTest[4] = el;
+  };
   const addDelayString = () => {
     let delayValue = input.value;
     if (!delayValue) {
@@ -234,23 +267,23 @@ function DrawAdditionalFields(props) {
         <div>
           <h3>Test some values</h3>
           <label htmlFor="text">
-            <input type="checkbox" name="text" checked="checked" />
+            <input type="checkbox" name="text" ref={setText} />
             Text
           </label>
           <label htmlFor="size">
-            <input type="checkbox" name="size" />
+            <input type="checkbox" name="size" ref={setSize} />
             Size
           </label>
           <label htmlFor="classes">
-            <input type="checkbox" name="classes" />
+            <input type="checkbox" name="classes" ref={setClasses} />
             Classes
           </label>
           <label htmlFor="quantity">
-            <input type="checkbox" name="quantity" />
+            <input type="checkbox" name="quantity" ref={setQuantity} />
             Quantity
           </label>
           <label htmlFor="focus">
-            <input type="checkbox" name="focus" />
+            <input type="checkbox" name="focus" ref={setFocus} />
             Focus
           </label>
           <label htmlFor="attribute">
