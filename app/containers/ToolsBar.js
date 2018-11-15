@@ -7,7 +7,8 @@ import ToolsBar from '../components/ToolsBar';
 
 function mapStateToProps(state) {
   return {
-    testBody: state.testBody
+    testBody: state.testBody,
+    mode: state.mode
   };
 }
 function mapDispatchToProps(dispatch) {

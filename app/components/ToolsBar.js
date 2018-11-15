@@ -15,7 +15,8 @@ type Props = {
   doTestAction: () => void,
   clearTest: () => void,
   deleteOneString: () => void,
-  testBody: []
+  testBody: [],
+  mode: 0
 };
 // // const store = confStore.configureStore();
 const store = initial.getStore();
@@ -45,32 +46,45 @@ export default class ToolsBar extends Component<Props> {
       doTestAction,
       clearTest,
       deleteOneString,
-      testBody
+      testBody,
+      mode
     } = this.props;
 
     return (
       <div>
         <div>
-          <div id="testField">Your test is here:</div>
+          <h2 id="testField">Your test is here:</h2>
         </div>
-        <ul>
+        <table border="1">
+          <tr>
+            <td>№</td>
+            <td>action</td>
+            <td>atribute</td>
+            <td>paths</td>
+            <td>delete</td>
+          </tr>
           {testBody.map((v, index) => (
-            <div>
-              <p>{index + 1}</p>
-              <li>{`${v.actionName} | ${v.attributes}`}</li>
-              <button
-                className={styles.btn}
-                onClick={() => {
-                  deleteOneString(index + 1);
-                }}
-                data-tclass="btn"
-                type="button"
-              >
-                delete string
-              </button>
-            </div>
+            <tr>
+              <td>{index + 1}</td>
+              <td>{`${v.actionName}`}</td>
+              <td>{`${v.attributes}`}</td>
+              <td>{`${v.paths}`}</td>
+              <td>
+                <button
+                  className={styles.btn}
+                  onClick={() => {
+                    deleteOneString(index + 1);
+                  }}
+                  data-tclass="btn"
+                  type="button"
+                >
+                  X
+                </button>
+              </td>
+            </tr>
           ))}
-        </ul>
+        </table>
+
         <div>
           <div className={styles.btnGroup}>
             <button
@@ -79,7 +93,7 @@ export default class ToolsBar extends Component<Props> {
               data-tclass="btn"
               type="button"
             >
-              wait
+              wait for smth
             </button>
             <button
               className={styles.btn}
@@ -87,7 +101,7 @@ export default class ToolsBar extends Component<Props> {
               data-tclass="btn"
               type="button"
             >
-              fix
+              write action
             </button>
             <button
               className={styles.btn}
@@ -95,7 +109,7 @@ export default class ToolsBar extends Component<Props> {
               data-tclass="btn"
               type="button"
             >
-              test
+              test element
             </button>
           </div>
           <div>
@@ -115,9 +129,90 @@ export default class ToolsBar extends Component<Props> {
             >
               save test
             </button>
+            <button className={styles.btn} data-tclass="btn" type="button">
+              run test
+            </button>
+            <button className={styles.btn} data-tclass="btn" type="button">
+              convert test
+            </button>
           </div>
         </div>
+        <DrawAdditionalFields mode={mode} />
       </div>
     );
+  }
+}
+function DrawAdditionalFields(props) {
+  const currMode = props.mode;
+  switch (currMode) {
+    case 1: {
+      return (
+        <div>
+          <h3>
+            Type delay in milliseconds or pick element, that needs to be wated
+          </h3>
+          <input type="text" placeholder="Type delay in ms" />
+          <button type="button">Add delay</button>
+          <h3>or</h3>
+          <label htmlFor="isExisting">
+            <input type="checkbox" name="isExisting" />
+            element exists
+          </label>
+          <input type="text" placeholder="Waiting time in ms" />
+          <button type="button">Add waiting</button>
+          <div>
+            <p>
+              if you want to wait for some element to exist, click this button
+              and pick element by your cursor
+            </p>
+          </div>
+        </div>
+      );
+    }
+    case 2: {
+      return (
+        <div>
+          <h3>Do something witn your page</h3>
+          <p>click anythere, type something or resize testing page window</p>
+        </div>
+      );
+    }
+    case 3: {
+      return (
+        <div>
+          <h3>Test some values</h3>
+          <label htmlFor="text">
+            <input type="checkbox" name="text" />
+            Text
+          </label>
+          <label htmlFor="size">
+            <input type="checkbox" name="size" />
+            Size
+          </label>
+          <label htmlFor="classes">
+            <input type="checkbox" name="classes" />
+            Classes
+          </label>
+          <label htmlFor="quantity">
+            <input type="checkbox" name="quantity" />
+            Quantity
+          </label>
+          <label htmlFor="focus">
+            <input type="checkbox" name="focus" />
+            Focus
+          </label>
+          <label htmlFor="attribute">
+            <input type="checkbox" name="attribute" />
+            Attribute
+          </label>
+          <p>
+            pick the characteristics, that you want to be tested, then pick an
+            element by your cursor
+          </p>
+        </div>
+      );
+    }
+    default:
+      return <h3>Select mode please</h3>;
   }
 }
