@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from './Counter.css';
-import { saveTestToFile } from '../helpers';
+// import { saveTestToFile } from '../helpers';
 // import * as confStore from '../store/configureStore';
 import { addTestString, deletePrevious } from '../actions/testBodyActions';
 import * as initial from '../initialState';
@@ -32,7 +32,8 @@ const store = initial.getStore();
 let state = null;
 function helpingFunction() {
   state = store.getState();
-  saveTestToFile(state);
+  ipc.send('save-test', state.testBody);
+  // saveTestToFile(state);
 }
 function deletePreviousTwo() {
   store.dispatch(deletePrevious());

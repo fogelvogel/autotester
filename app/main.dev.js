@@ -177,10 +177,11 @@ app.on('ready', async () => {
   }
 
   function saveTest(event, args) {
-    const savingArr = [...args];
-    for (let i = 0; i < savingArr.length; i += 1) {
-      a.write(savingArr[i]);
-    }
+    const savingArr = JSON.stringify([...args]);
+    a.write(savingArr);
+    // for (let i = 0; i < savingArr.length; i += 1) {
+    //   a.write(savingArr[i]);
+    // }
   }
 
   function loadTestingPage(event, args) {
