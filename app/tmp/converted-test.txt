@@ -1,0 +1,22 @@
+await new Promise((resolve) => setTimeout(resolve, 1000));
+await app.client.waitForExist('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]', 4646, false);
+await app.client.waitForExist('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]/FORM[1]/DIV[1]/SPAN[1]/SPAN[1]/INPUT[1]', 4646, false);
+await app.client.waitForExist('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]', 4646, false);
+await app.client.click('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]');
+await app.client.click('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]/FORM[1]/DIV[1]/SPAN[1]/SPAN[1]/INPUT[1]');
+await app.client.doubleClick('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]');
+await app.client.click('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]/FORM[1]/DIV[1]/SPAN[1]/SPAN[1]/INPUT[1]');
+expect((await app.client.element('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]')).value).not.toBeNull();
+expect((await app.client.element('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]/FORM[1]/DIV[1]/SPAN[1]/SPAN[1]/INPUT[1]')).value).not.toBeNull();
+expect((await app.client.getText('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]/FORM[1]/DIV[1]/SPAN[1]/SPAN[1]/INPUT[1]')).value).toEqual('');
+expect((await app.client.getText('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]')).value).toEqual('
+
+Найти
+');
+expect(await app.client.getAttribute('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]', 'class')).toEqual('b-table__cell');
+expect((await app.client.getText('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]')).value).toEqual('
+
+Найти
+');
+expect(await app.client.getElementSize('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]')).toEqual({width: 634, height: 1024});
+expect(await app.client.getAttribute('/HTML[1]/BODY[1]/TABLE[1]/TBODY[1]/TR[2]/TD[1]', 'class')).toEqual('b-table__cell');

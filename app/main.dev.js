@@ -25,7 +25,9 @@ let toolsWindow = null;
 
 // const paramsArr = ['dadds347yhKLIFHL', 45645, '', 0, 'fkfflfkrofjlldfggdgdrgdrgdfgvfd']
 
-const a = fs.createWriteStream(path.join(__dirname, '/tmp/clicks.txt'));
+const a = fs.createWriteStream(path.join(__dirname, '/tmp/test.txt'));
+
+const b = fs.createWriteStream(path.join(__dirname, '/tmp/converted-test.txt'));
 
 // if (process.env.NODE_ENV === 'production') {
 //   const sourceMapSupport = require('source-map-support');
@@ -183,6 +185,12 @@ app.on('ready', async () => {
     //   a.write(savingArr[i]);
     // }
   }
+  function saveConvertedTest(event, args) {
+    const savingArr = [...args];
+    for (let i = 0; i < savingArr.length; i += 1) {
+      b.write(savingArr[i]);
+    }
+  }
 
   function loadTestingPage(event, args) {
     // mainWindow.loadURL(args);
@@ -198,6 +206,7 @@ app.on('ready', async () => {
 
   ipcMain.on('new-url-event', loadTestingPage);
   ipcMain.on('save-test', saveTest);
+  ipcMain.on('save-converted-test', saveConvertedTest);
   ipcMain.on('new-scroll', clickFunction);
   ipcMain.on('new-resize', clickFunction);
 });

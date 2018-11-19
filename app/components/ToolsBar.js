@@ -4,6 +4,7 @@ import styles from './Counter.css';
 // import * as confStore from '../store/configureStore';
 import { addTestString, deletePrevious } from '../actions/testBodyActions';
 import * as initial from '../initialState';
+import { convertTest } from '../helpers';
 
 const ipc = require('electron').ipcRenderer;
 
@@ -34,6 +35,10 @@ function helpingFunction() {
   state = store.getState();
   ipc.send('save-test', state.testBody);
   // saveTestToFile(state);
+}
+function helpConvertTest() {
+  state = store.getState();
+  convertTest(state);
 }
 function deletePreviousTwo() {
   store.dispatch(deletePrevious());
@@ -205,7 +210,12 @@ export default class ToolsBar extends Component<Props> {
             <button className={styles.btn} data-tclass="btn" type="button">
               run test
             </button>
-            <button className={styles.btn} data-tclass="btn" type="button">
+            <button
+              className={styles.btn}
+              data-tclass="btn"
+              type="button"
+              onClick={helpConvertTest}
+            >
               convert test
             </button>
           </div>
