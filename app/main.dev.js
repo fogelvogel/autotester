@@ -166,6 +166,10 @@ app.on('ready', async () => {
     const testString = buildTestString('keydown', args);
     toolsWindow.webContents.send('new test string available', testString);
   }
+  function keyupFunction(event, args) {
+    const testString = buildTestString('keyup', args);
+    toolsWindow.webContents.send('new test string available', testString);
+  }
 
   function doubleclickFunction(event, args) {
     toolsWindow.webContents.send('need to delete previous two');
@@ -189,6 +193,7 @@ app.on('ready', async () => {
   ipcMain.on('new-mouse-doubleclick-event', doubleclickFunction);
 
   ipcMain.on('keydown', keydownFunction);
+  ipcMain.on('keyup', keyupFunction);
 
   ipcMain.on('new-url-event', loadTestingPage);
   ipcMain.on('save-test', saveTest);

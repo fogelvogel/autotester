@@ -101,3 +101,10 @@ window.onkeydown = e => {
 
   ipc.send('keydown', tmp);
 };
+window.onkeyup = e => {
+  let tmp = getPathTo(e.target);
+  const params = e.key;
+  tmp = `${tmp} ${params}`;
+
+  ipc.send('keyup', tmp);
+};
