@@ -23,7 +23,9 @@ const { ipcMain } = require('electron');
 let mainWindow = null;
 let toolsWindow = null;
 
-// const a = fs.createWriteStream(path.join(__dirname, '/tmp/clicks.txt'));
+// const paramsArr = ['dadds347yhKLIFHL', 45645, '', 0, 'fkfflfkrofjlldfggdgdrgdrgdfgvfd']
+
+const a = fs.createWriteStream(path.join(__dirname, '/tmp/clicks.txt'));
 
 // if (process.env.NODE_ENV === 'production') {
 //   const sourceMapSupport = require('source-map-support');
@@ -158,13 +160,7 @@ app.on('ready', async () => {
   // }
 
   function clickFunction(event, args) {
-    const testString = buildTestString('click', args);
-    // const testDelayString = buildDelayTestString();
-    // addTestString(testString);
-    toolsWindow.webContents.send('new test string available', testString);
-    // toolsWindow.webContents.send('new test string available', testDelayString);
-    // toolsWindow.webContents.send('new test string available', 'delay 1000\n');
-    // a.write(`click ${args}\n`);
+    toolsWindow.webContents.send('new test string available', args);
   }
   function keydownFunction(event, args) {
     const testString = buildTestString('keydown', args);
@@ -173,14 +169,14 @@ app.on('ready', async () => {
 
   function doubleclickFunction(event, args) {
     toolsWindow.webContents.send('need to delete previous two');
-    // const testDelayString = buildDelayTestString();
+    toolsWindow.webContents.send('new test string available', args);
+  }
 
-    const testString = buildTestString('click', args);
-    toolsWindow.webContents.send('new test string available', testString);
-    // toolsWindow.webContents.send('new test string available', testDelayString);
-    // addTestString('delay 1000');
-
-    // a.write(`click ${args}\n`);
+  function saveTest(event, args) {
+    const savingArr = [...args];
+    for (let i = 0; i < savingArr.length; i += 1) {
+      a.write(savingArr[i]);
+    }
   }
 
   function loadTestingPage(event, args) {
@@ -195,7 +191,7 @@ app.on('ready', async () => {
   ipcMain.on('keydown', keydownFunction);
 
   ipcMain.on('new-url-event', loadTestingPage);
-  //   ipcMain.on('give-me-the-function', () => {
-  //       mainWindow.webContents.send('ready-to-write-clicks', getPath);
-  //   });
+  ipcMain.on('save-test', saveTest);
+  ipcMain.on('new-scroll', clickFunction);
+  ipcMain.on('new-resize', clickFunction);
 });

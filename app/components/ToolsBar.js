@@ -7,16 +7,12 @@ import * as initial from '../initialState';
 
 const ipc = require('electron').ipcRenderer;
 
+let prevString;
+
 let wait = null;
 let exists = null;
 const toTest = [];
-const namesOfTestingAttributes = [
-  'text',
-  'size',
-  'classes',
-  'quantity',
-  'focus'
-];
+const namesOfTestingAttributes = ['text', 'size', 'classes'];
 
 ipc.on('need to delete previous two', deletePreviousTwo);
 ipc.on('new test string available', addString);
@@ -44,19 +40,55 @@ function deletePreviousTwo() {
 }
 function addString(event, args) {
   state = store.getState();
+  prevString = state.testBody[state.testBody.length - 1];
+
   if (state.mode === 2) {
-    store.dispatch(addTestString(args));
-  } else if (state.mode === 3) {
-    const arrToTest = [];
-    for (let i = 0; i < 5; i += 1) {
-      if (toTest[i].checked) {
-        arrToTest.push(namesOfTestingAttributes[i]);
+    if (prevString !== undefined) {
+      if (
+        prevString.actionName === args.actionName &&
+        args.actionName === 'scroll' &&
+        prevString.attributes[1] === args.attributes[1]
+      ) {
+        store.dispatch(deletePrevious());
+      }
+      if (
+        prevString.actionName === args.actionName &&
+        args.actionName === 'resize'
+      ) {
+        store.dispatch(deletePrevious());
       }
     }
-    const newArgs = Object.assign({}, args, {
+    //   prevString = {
+    //     actionName: args.actionName,
+    //     attributes: args.attributes,
+    //     paths: args.paths
+    //   };
+    store.dispatch(
+      addTestString({
+        actionName: args.actionName,
+        attributes: args.attributes,
+        paths: args.paths
+      })
+    );
+  } else if (state.mode === 3) {
+    if (args.actionName !== 'click') {
+      return;
+    }
+    const arrToTest = [];
+    let counter = 0;
+    for (let i = 0; i < 3; i += 1) {
+      if (toTest[i].checked) {
+        arrToTest.push(namesOfTestingAttributes[i]);
+        arrToTest[counter] += `=${args.testParams[i]}`;
+        counter += 1;
+      }
+    }
+    const newArgs = {
       actionName: 'test',
-      attributes: arrToTest
-    });
+      attributes: arrToTest,
+      paths: args.paths
+    };
+    // prevString = newArgs;
     store.dispatch(addTestString(newArgs));
   } else if (state.mode === 1) {
     let waitValue = wait.value;
@@ -64,10 +96,12 @@ function addString(event, args) {
       waitValue = '5000';
     }
     const existValue = exists.checked;
-    const newArgs = Object.assign({}, args, {
+    const newArgs = {
       actionName: 'wait',
-      attributes: [existValue, waitValue]
-    });
+      attributes: [existValue, waitValue],
+      paths: args.paths
+    };
+    // prevString = newArgs;
     store.dispatch(addTestString(newArgs));
   }
 }
@@ -208,13 +242,6 @@ function DrawAdditionalFields(props) {
     toTest[2] = el;
   };
 
-  const setQuantity = el => {
-    toTest[3] = el;
-  };
-
-  const setFocus = el => {
-    toTest[4] = el;
-  };
   const addDelayString = () => {
     let delayValue = input.value;
     if (!delayValue) {
@@ -277,14 +304,6 @@ function DrawAdditionalFields(props) {
           <label htmlFor="classes">
             <input type="checkbox" name="classes" ref={setClasses} />
             Classes
-          </label>
-          <label htmlFor="quantity">
-            <input type="checkbox" name="quantity" ref={setQuantity} />
-            Quantity
-          </label>
-          <label htmlFor="focus">
-            <input type="checkbox" name="focus" ref={setFocus} />
-            Focus
           </label>
           <label htmlFor="attribute">
             <input type="checkbox" name="attribute" />

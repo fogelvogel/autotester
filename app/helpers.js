@@ -1,7 +1,6 @@
-import fs from 'fs';
 import { autotesterStateType } from './reducers/types';
 
-const path = require('path');
+const ipc = require('electron').ipcRenderer;
 
 // const a = fs.createWriteStream(path.join(__dirname, '/tmp/clicks.txt'));
 // const myPath = path.join(__dirname, '/tmp/clicks.txt');
@@ -20,20 +19,19 @@ export default function checkField(value: string) {
   return isValid;
 }
 export function saveTestToFile(state: autotesterStateType) {
-  const a = fs.createWriteStream(path.join(__dirname, '/tmp/clicks.txt'));
+  const allTest = [];
 
   for (let i = 0; i < state.testBody.length; i += 1) {
-    saveOneString(state.testBody[i], a);
+    allTest[i] = saveOneString(state.testBody[i]);
   }
-  console.log('test saved');
+  ipc.send('save-test', allTest);
 }
-function saveOneString(testString, stream) {
+function saveOneString(testString) {
   let paths;
   if (testString.paths !== null) {
     paths = `#${testString.paths.join('#')}`;
   }
   const attributes = `${testString.attributes.join(' ')}`;
 
-  console.log(`${testString.actionName} ${attributes} ${paths}`);
-  stream.write(`${testString.actionName} ${attributes} ${paths}`);
+  return `${testString.actionName} ${attributes} ${paths}\n`;
 }

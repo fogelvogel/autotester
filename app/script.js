@@ -28,26 +28,71 @@ function getPathTo(element) {
 console.log('this script was injected');
 
 window.onclick = e => {
-  // TODO: посылать сообщение только если прога находится во втором состоянии
-  if (e.eventPhase === 3) {
-    let tmp = getPathTo(e.target);
-    const params = `left`;
-    tmp = `${tmp} ${params}`;
-
-    ipc.send('new-mouse-click-event', tmp);
-  }
+  const tmp = getPathTo(e.target);
+  const testingParams = [
+    e.target.innerText,
+    `${e.target.clientHeight} ${e.target.clientWidth}`,
+    e.target.className
+  ];
+  ipc.send(
+    'new-mouse-click-event',
+    Object.assign(
+      {},
+      {
+        actionName: 'click',
+        attributes: ['left'],
+        paths: [tmp],
+        testParams: testingParams
+      }
+    )
+  );
 };
 window.ondblclick = e => {
-  let tmp = getPathTo(e.target);
-  const params = `left double`;
-  tmp = `${tmp} ${params}`;
-  ipc.send('new-mouse-doubleclick-event', tmp);
+  const tmp = getPathTo(e.target);
+  const testingParams = [
+    e.target.innerText,
+    `${e.target.clientHeight} ${e.target.clientWidth}`,
+    e.target.className
+  ];
+  ipc.send(
+    'new-mouse-doubleclick-event',
+    Object.assign(
+      {},
+      {
+        actionName: 'click',
+        attributes: ['left', 'double'],
+        paths: [tmp],
+        testParams: testingParams
+      }
+    )
+  );
 };
-window.onresize = e => {
-  console.log(e.detail);
+window.onresize = () => {
+  ipc.send(
+    'new-resize',
+    Object.assign(
+      {},
+      {
+        actionName: 'resize',
+        attributes: [`${window.outerHeight} ${window.outerWidth}`],
+        paths: []
+      }
+    )
+  );
 };
 window.onscroll = e => {
-  console.log(e.detail);
+  const scrollDown = window.scrollY;
+  ipc.send(
+    'new-scroll',
+    Object.assign(
+      {},
+      {
+        actionName: 'scroll',
+        attributes: [scrollDown, e.target.className],
+        paths: []
+      }
+    )
+  );
 };
 window.onkeydown = e => {
   let tmp = getPathTo(e.target);
