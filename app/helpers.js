@@ -10,6 +10,8 @@ const ipc = require('electron').ipcRenderer;
 //   }
 //     console.log('file was written successfully');
 // });
+const keysArr = ['Meta', 'Control', 'Alt', 'Shift'];
+// const webdriverKeys = ['command', 'ControlLeft', 'AltLeft', 'ShiftLeft'];
 
 export default function checkField(value: string) {
   let isValid = true;
@@ -69,9 +71,16 @@ function convertOneString(testString) {
       }
       return testingStrings;
     }
-    //   case 'keydown': {
-
-    //   }
+    case 'keyup': {
+      const index = keysArr.findIndex;
+      if (index === -1) {
+        return;
+      }
+      return `await app.client.keys('${testString.attributes[0]}').then();\n`;
+    }
+    case 'keydown': {
+      return `await app.client.keys('${testString.attributes[0]}').then();\n`;
+    }
     default:
       break;
   }
