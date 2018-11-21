@@ -89,15 +89,19 @@ function convertOneString(testString) {
   }
   return '';
 }
+function replaceNBSPs(str) {
+  const re = new RegExp(String.fromCharCode(160), 'g');
+  return str.replace(re, ' ');
+}
 function makeTestingString(attribute, paths) {
   const attrib = attribute.split('=');
   const sizes = attrib[1].split(' ');
 
   switch (attrib[0]) {
     case 'text': {
-      return `expect(await app.client.getText('${paths}')).toEqual('${
+      return `expect(await app.client.getText('${paths}')).toEqual('${replaceNBSPs(
         attrib[1]
-      }');\n`;
+      ).trim()}');\n`;
     }
     case 'size': {
       return `expect(await app.client.getElementSize('${paths}')).toEqual({height: ${
