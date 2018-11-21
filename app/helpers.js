@@ -1,4 +1,5 @@
 import { autotesterStateType } from './reducers/types';
+// import * as initial from './initialState';
 
 const ipc = require('electron').ipcRenderer;
 
@@ -72,9 +73,11 @@ function convertOneString(testString) {
       return testingStrings;
     }
     case 'keyup': {
-      const index = keysArr.findIndex;
+      const index = keysArr.findIndex(
+        element => element === testString.attributes[0]
+      );
       if (index === -1) {
-        return;
+        return '';
       }
       return `await app.client.keys('${testString.attributes[0]}').then();\n`;
     }
@@ -92,14 +95,14 @@ function makeTestingString(attribute, paths) {
 
   switch (attrib[0]) {
     case 'text': {
-      return `expect((await app.client.getText('${paths}')).value).toEqual('${
+      return `expect(await app.client.getText('${paths}')).toEqual('${
         attrib[1]
       }');\n`;
     }
     case 'size': {
-      return `expect(await app.client.getElementSize('${paths}')).toEqual({width: ${
+      return `expect(await app.client.getElementSize('${paths}')).toEqual({height: ${
         sizes[0]
-      }, height: ${sizes[1]}});\n`;
+      }, width: ${sizes[1]}});\n`;
     }
     case 'classes': {
       return `expect(await app.client.getAttribute('${paths}', 'class')).toEqual('${

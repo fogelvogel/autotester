@@ -1,5 +1,9 @@
 // @flow
 import { app, Menu, shell, BrowserWindow } from 'electron';
+// import { saveTestToFile } from './helpers';
+// import { getStore } from './initialState';
+
+// const store = initial.getStore();
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
@@ -72,6 +76,17 @@ export default class MenuBuilder {
           click: () => {
             app.quit();
           }
+        }
+      ]
+    };
+    const subMenuFile = {
+      label: 'File',
+      submenu: [
+        { label: 'Open', accelerator: 'Command+O', selector: 'open:' },
+        {
+          label: 'Save as',
+          accelerator: 'Shift+Command+S',
+          selector: 'saveAs:'
         }
       ]
     };
@@ -177,7 +192,14 @@ export default class MenuBuilder {
     const subMenuView =
       process.env.NODE_ENV === 'development' ? subMenuViewDev : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [
+      subMenuAbout,
+      subMenuFile,
+      subMenuEdit,
+      subMenuView,
+      subMenuWindow,
+      subMenuHelp
+    ];
   }
 
   buildDefaultTemplate() {

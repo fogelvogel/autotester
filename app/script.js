@@ -29,9 +29,10 @@ console.log('this script was injected');
 
 window.onclick = e => {
   const tmp = getPathTo(e.target);
+  console.log(e.target);
   const testingParams = [
     e.target.innerText,
-    `${e.target.clientHeight} ${e.target.clientWidth}`,
+    `${e.target.offsetHeight} ${e.target.offsetWidth}`,
     e.target.className
   ];
   ipc.send(

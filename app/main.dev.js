@@ -11,8 +11,10 @@
  * @flow
  */
 import { app, BrowserWindow } from 'electron';
+// import { app, BrowserWindow, Menu } from 'electron';
 
 import fs from 'fs';
+// import MenuBuilder from './menu';
 // import { addTestString, deletePrevious } from './actions/testBodyActions';
 // import getPath from './helpers';
 
@@ -101,6 +103,7 @@ app.on('ready', async () => {
     // if (process.env.START_MINIMIZED) {
     //     toolsWindow.minimize();
     // } else {
+
     toolsWindow.show();
     toolsWindow.focus();
   });
@@ -133,6 +136,9 @@ app.on('ready', async () => {
         );
       }
     );
+    // const menuBuilder = new MenuBuilder(mainWindow);
+    // const menu = menuBuilder.buildMenu();
+    // Menu.setApplicationMenu(menu);
   });
 
   // let argsToString;
