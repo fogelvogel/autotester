@@ -13,6 +13,8 @@ export default class MenuBuilder {
 
   toolsWindow: BrowserWindow;
 
+  showAllWindow: BrowserWindow;
+
   dialog = dialog;
 
   openFile() {
@@ -65,9 +67,18 @@ export default class MenuBuilder {
     this.toolsWindow.webContents.send('need to save');
   }
 
-  constructor(mainWindow: BrowserWindow, toolsWindow: BrowserWindow) {
+  showAll() {
+    this.showAllWindow.loadURL(`file://${__dirname}/findTests.html`);
+  }
+
+  constructor(
+    mainWindow: BrowserWindow,
+    toolsWindow: BrowserWindow,
+    showAllWindow: BrowserWindow
+  ) {
     this.mainWindow = mainWindow;
     this.toolsWindow = toolsWindow;
+    this.showAllWindow = showAllWindow;
   }
 
   buildMenu() {
@@ -162,6 +173,13 @@ export default class MenuBuilder {
           selector: 'saveAs:',
           click: () => {
             this.saveFile();
+          }
+        },
+        {
+          label: 'Show all',
+          selector: 'showAll:',
+          click: () => {
+            this.showAll();
           }
         }
       ]

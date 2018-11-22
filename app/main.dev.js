@@ -22,6 +22,7 @@ const { ipcMain } = require('electron');
 
 let mainWindow = null;
 let toolsWindow = null;
+let showAllWindow = null;
 
 global.savingName = { name: path.join(__dirname, `/tmp/test1`) };
 // if (process.env.NODE_ENV === 'production') {
@@ -84,6 +85,12 @@ app.on('ready', async () => {
     height: 728
   });
 
+  showAllWindow = new BrowserWindow({
+    show: false,
+    width: 1024,
+    height: 728
+  });
+
   toolsWindow.loadURL(`file://${__dirname}/tools.html`);
   // mainWindow.loadURL(`http://ya.ru`);
 
@@ -101,9 +108,24 @@ app.on('ready', async () => {
     toolsWindow.focus();
   });
 
+  showAllWindow.webContents.on('did-finish-load', () => {
+    if (!showAllWindow) {
+      throw new Error('"showAllWindow" is not defined');
+    }
+    showAllWindow.show();
+    showAllWindow.focus();
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  toolsWindow.on('closed', () => {
     toolsWindow = null;
+  });
+
+  showAllWindow.on('closed', () => {
+    showAllWindow = null;
   });
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
@@ -129,7 +151,7 @@ app.on('ready', async () => {
         );
       }
     );
-    const menuBuilder = new MenuBuilder(mainWindow, toolsWindow);
+    const menuBuilder = new MenuBuilder(mainWindow, toolsWindow, showAllWindow);
     const menu = menuBuilder.buildMenu();
     Menu.setApplicationMenu(menu);
   });

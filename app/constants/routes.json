@@ -1,4 +1,5 @@
 {
   "HOME": "/",
-  "TEST": "/toolsBar"
+  "TEST": "/toolsBar",
+  "FINDTESTS": "/findTests"
 }
