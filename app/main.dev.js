@@ -10,13 +10,11 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
-// import { app, BrowserWindow, Menu } from 'electron';
+// import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, Menu } from 'electron';
 
 import fs from 'fs';
-// import MenuBuilder from './menu';
-// import { addTestString, deletePrevious } from './actions/testBodyActions';
-// import getPath from './helpers';
+import MenuBuilder from './menu';
 
 const path = require('path');
 
@@ -25,12 +23,7 @@ const { ipcMain } = require('electron');
 let mainWindow = null;
 let toolsWindow = null;
 
-// const paramsArr = ['dadds347yhKLIFHL', 45645, '', 0, 'fkfflfkrofjlldfggdgdrgdrgdfgvfd']
-
-const a = fs.createWriteStream(path.join(__dirname, '/tmp/test.txt'));
-
-const b = fs.createWriteStream(path.join(__dirname, '/tmp/converted-test.txt'));
-
+global.savingName = { name: 'test1' };
 // if (process.env.NODE_ENV === 'production') {
 //   const sourceMapSupport = require('source-map-support');
 //   sourceMapSupport.install();
@@ -136,9 +129,9 @@ app.on('ready', async () => {
         );
       }
     );
-    // const menuBuilder = new MenuBuilder(mainWindow);
-    // const menu = menuBuilder.buildMenu();
-    // Menu.setApplicationMenu(menu);
+    const menuBuilder = new MenuBuilder(mainWindow, toolsWindow);
+    const menu = menuBuilder.buildMenu();
+    Menu.setApplicationMenu(menu);
   });
 
   // let argsToString;
@@ -185,17 +178,25 @@ app.on('ready', async () => {
   }
 
   function saveTest(event, args) {
+    const saveStream = fs.createWriteStream(
+      path.join(__dirname, `/tmp/${global.savingName.name}.txt`)
+    );
     const savingArr = JSON.stringify([...args]);
-    a.write(savingArr);
+    saveStream.write(savingArr);
+    saveStream.close();
     // for (let i = 0; i < savingArr.length; i += 1) {
     //   a.write(savingArr[i]);
     // }
   }
   function saveConvertedTest(event, args) {
+    const convertStream = fs.createWriteStream(
+      path.join(__dirname, '/tmp/converted/converted-test.txt')
+    );
     const savingArr = [...args];
     for (let i = 0; i < savingArr.length; i += 1) {
-      b.write(savingArr[i]);
+      convertStream.write(savingArr[i]);
     }
+    convertStream.close();
   }
 
   function loadTestingPage(event, args) {

@@ -17,6 +17,7 @@ const namesOfTestingAttributes = ['text', 'size', 'classes'];
 
 ipc.on('need to delete previous two', deletePreviousTwo);
 ipc.on('new test string available', addString);
+ipc.on('new test available', loadTest);
 
 type Props = {
   waitForElement: () => void,
@@ -44,9 +45,27 @@ function deletePreviousTwo() {
   store.dispatch(deletePrevious());
   store.dispatch(deletePrevious());
 }
+function loadTest(event, args) {
+  state = store.getState();
+  store.dispatch({ type: 'CLEAR_TEST' });
+  const testBody = [...args];
+  const testBodyLength = testBody.length;
+  console.log(testBody);
+  for (let i = 0; i < testBodyLength; i += 1) {
+    store.dispatch(
+      addTestString({
+        actionName: testBody[i].actionName,
+        attributes: testBody[i].attributes,
+        paths: testBody[i].paths
+      })
+    );
+  }
+}
+
 function addString(event, args) {
   state = store.getState();
-  prevString = state.testBody[state.testBody.length - 1];
+  if (state.testBody.length > 0)
+    prevString = state.testBody[state.testBody.length - 1];
 
   if (state.mode === 2) {
     if (prevString !== undefined) {

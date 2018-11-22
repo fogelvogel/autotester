@@ -1,5 +1,8 @@
 // @flow
-import { app, Menu, shell, BrowserWindow } from 'electron';
+import { app, Menu, shell, BrowserWindow, dialog } from 'electron';
+// import fs from 'fs';
+const fs = require('fs');
+const path = require('path');
 // import { saveTestToFile } from './helpers';
 // import { getStore } from './initialState';
 
@@ -8,8 +11,37 @@ import { app, Menu, shell, BrowserWindow } from 'electron';
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
 
-  constructor(mainWindow: BrowserWindow) {
+  toolsWindow: BrowserWindow;
+
+  dialog = dialog;
+
+  openFile() {
+    this.dialog.showOpenDialog(
+      {
+        defaultPath: path.join(__dirname, '/tmp'),
+        filters: [
+          {
+            extensions: ['txt']
+          }
+        ]
+      },
+      fileNames => {
+        if (fileNames !== undefined) {
+          const fileName = fileNames[0];
+          fs.readFile(fileName, 'utf-8', (err, data) => {
+            this.toolsWindow.webContents.send(
+              'new test available',
+              JSON.parse(data)
+            );
+          });
+        }
+      }
+    );
+  }
+
+  constructor(mainWindow: BrowserWindow, toolsWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
+    this.toolsWindow = toolsWindow;
   }
 
   buildMenu() {
@@ -82,7 +114,14 @@ export default class MenuBuilder {
     const subMenuFile = {
       label: 'File',
       submenu: [
-        { label: 'Open', accelerator: 'Command+O', selector: 'open:' },
+        {
+          label: 'Open',
+          accelerator: 'Command+O',
+          selector: 'open:',
+          click: () => {
+            this.openFile();
+          }
+        },
         {
           label: 'Save as',
           accelerator: 'Shift+Command+S',
@@ -128,22 +167,23 @@ export default class MenuBuilder {
           accelerator: 'Alt+Command+I',
           click: () => {
             this.mainWindow.toggleDevTools();
+            this.toolsWindow.toggleDevTools();
           }
         }
       ]
     };
-    const subMenuViewProd = {
-      label: 'View',
-      submenu: [
-        {
-          label: 'Toggle Full Screen',
-          accelerator: 'Ctrl+Command+F',
-          click: () => {
-            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-          }
-        }
-      ]
-    };
+    // const subMenuViewProd = {
+    //   label: 'View',
+    //   submenu: [
+    //     {
+    //       label: 'Toggle Full Screen',
+    //       accelerator: 'Ctrl+Command+F',
+    //       click: () => {
+    //         this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+    //       }
+    //     }
+    //   ]
+    // };
     const subMenuWindow = {
       label: 'Window',
       submenu: [
@@ -189,8 +229,8 @@ export default class MenuBuilder {
       ]
     };
 
-    const subMenuView =
-      process.env.NODE_ENV === 'development' ? subMenuViewDev : subMenuViewProd;
+    const subMenuView = subMenuViewDev;
+    // process.env.NODE_ENV === 'development' ? subMenuViewDev : subMenuViewProd;
 
     return [
       subMenuAbout,

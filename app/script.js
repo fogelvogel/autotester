@@ -25,11 +25,10 @@ function getPathTo(element) {
     }
   }
 }
-console.log('this script was injected');
 
 window.onclick = e => {
   const tmp = getPathTo(e.target);
-  console.log(e.target);
+
   const testingParams = [
     e.target.innerText,
     `${e.target.offsetHeight} ${e.target.offsetWidth}`,
