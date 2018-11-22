@@ -23,7 +23,7 @@ const { ipcMain } = require('electron');
 let mainWindow = null;
 let toolsWindow = null;
 
-global.savingName = { name: 'test1' };
+global.savingName = { name: path.join(__dirname, `/tmp/test1`) };
 // if (process.env.NODE_ENV === 'production') {
 //   const sourceMapSupport = require('source-map-support');
 //   sourceMapSupport.install();
@@ -178,9 +178,8 @@ app.on('ready', async () => {
   }
 
   function saveTest(event, args) {
-    const saveStream = fs.createWriteStream(
-      path.join(__dirname, `/tmp/${global.savingName.name}.txt`)
-    );
+    const saveStream = fs.createWriteStream(`${global.savingName.name}.txt`);
+
     const savingArr = JSON.stringify([...args]);
     saveStream.write(savingArr);
     saveStream.close();
@@ -189,14 +188,16 @@ app.on('ready', async () => {
     // }
   }
   function saveConvertedTest(event, args) {
+    const fileNames = global.savingName.name.split('/');
+    const last = fileNames.pop();
     const convertStream = fs.createWriteStream(
-      path.join(__dirname, '/tmp/converted/converted-test.txt')
+      `${fileNames.join('/')}/converted/${last}-converted.txt`
     );
     const savingArr = [...args];
-    for (let i = 0; i < savingArr.length; i += 1) {
+    const arrLength = savingArr.length;
+    for (let i = 0; i < arrLength; i += 1) {
       convertStream.write(savingArr[i]);
     }
-    convertStream.close();
   }
 
   function loadTestingPage(event, args) {

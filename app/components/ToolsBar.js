@@ -18,6 +18,7 @@ const namesOfTestingAttributes = ['text', 'size', 'classes'];
 ipc.on('need to delete previous two', deletePreviousTwo);
 ipc.on('new test string available', addString);
 ipc.on('new test available', loadTest);
+ipc.on('need to save as', helpingFunction);
 
 type Props = {
   waitForElement: () => void,
@@ -37,13 +38,17 @@ function helpingFunction() {
   ipc.send('save-test', state.testBody);
   // saveTestToFile(state);
 }
+
 function helpConvertTest() {
   state = store.getState();
   convertTest(state);
 }
 function deletePreviousTwo() {
-  store.dispatch(deletePrevious());
-  store.dispatch(deletePrevious());
+  state = store.getState();
+  if (state.mode === 2) {
+    store.dispatch(deletePrevious());
+    store.dispatch(deletePrevious());
+  }
 }
 function loadTest(event, args) {
   state = store.getState();

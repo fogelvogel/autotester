@@ -21,6 +21,7 @@ export default class MenuBuilder {
         defaultPath: path.join(__dirname, '/tmp'),
         filters: [
           {
+            name: 'text',
             extensions: ['txt']
           }
         ]
@@ -28,12 +29,33 @@ export default class MenuBuilder {
       fileNames => {
         if (fileNames !== undefined) {
           const fileName = fileNames[0];
+          const name = fileName.split('.');
+          const index = 0;
+          global.savingName.name = name[index];
           fs.readFile(fileName, 'utf-8', (err, data) => {
             this.toolsWindow.webContents.send(
               'new test available',
               JSON.parse(data)
             );
           });
+        }
+      }
+    );
+  }
+
+  saveFile() {
+    this.dialog.showSaveDialog(
+      { filters: [{ name: 'text', extensions: ['txt'] }] },
+      fileName => {
+        if (fileName !== undefined) {
+          const name = fileName.split('.');
+          const index = 0;
+          global.savingName.name = name[index];
+          this.toolsWindow.webContents.send('need to save as', fileName);
+          //   global.savingName.name = ;
+          //     fs.writeFile(fileName, 'dadasd', (err) => {
+          //     if (err !== null) console.log('file was not written', err);
+          //   })
         }
       }
     );
@@ -125,7 +147,10 @@ export default class MenuBuilder {
         {
           label: 'Save as',
           accelerator: 'Shift+Command+S',
-          selector: 'saveAs:'
+          selector: 'saveAs:',
+          click: () => {
+            this.saveFile();
+          }
         }
       ]
     };
