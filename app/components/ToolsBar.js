@@ -19,6 +19,7 @@ ipc.on('need to delete previous two', deletePreviousTwo);
 ipc.on('new test string available', addString);
 ipc.on('new test available', loadTest);
 ipc.on('need to save as', helpingFunction);
+ipc.on('need to save', helpingFunction);
 
 type Props = {
   waitForElement: () => void,

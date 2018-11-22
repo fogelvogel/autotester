@@ -217,4 +217,7 @@ app.on('ready', async () => {
   ipcMain.on('save-converted-test', saveConvertedTest);
   ipcMain.on('new-scroll', clickFunction);
   ipcMain.on('new-resize', clickFunction);
+  ipcMain.on('need-to-reload', () => {
+    mainWindow.reload();
+  });
 });

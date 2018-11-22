@@ -61,6 +61,10 @@ export default class MenuBuilder {
     );
   }
 
+  save() {
+    this.toolsWindow.webContents.send('need to save');
+  }
+
   constructor(mainWindow: BrowserWindow, toolsWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
     this.toolsWindow = toolsWindow;
@@ -142,6 +146,14 @@ export default class MenuBuilder {
           selector: 'open:',
           click: () => {
             this.openFile();
+          }
+        },
+        {
+          label: 'Save',
+          accelerator: 'Command+S',
+          selector: 'save:',
+          click: () => {
+            this.save();
           }
         },
         {

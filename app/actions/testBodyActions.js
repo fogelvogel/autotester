@@ -1,5 +1,7 @@
 import type { testingString } from '../reducers/types';
 
+const ipc = require('electron').ipcRenderer;
+
 export const ADD_TEST_STRING = 'ADD_TEST_STRING';
 export const DELETE_PREVIOUS = 'DELETE_PREVIOUS';
 export const DELETE_ONE_STRING = 'DELETE_ONE_STRING';
@@ -24,6 +26,7 @@ export function deleteOneString(toDelete) {
   };
 }
 export function clearTest() {
+  ipc.send('need-to-reload');
   return {
     type: CLEAR_TEST
   };
