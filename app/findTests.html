@@ -9,13 +9,15 @@
           const link = document.createElement('link');
           link.rel = 'stylesheet';
           link.href = './dist/styleFind.css';
+          document.getElementsByTagName('head')[0].appendChild(link);
         }
       }());
     </script>
   </head>
   <body>
         <div id="findroot"></div>
-        <!-- <script>
+        <script src="./allTestPage.js"></script>
+        <script>
           {
             const scripts = [];
     
@@ -39,7 +41,7 @@
                 .join('')
             );
           }
-        </script> -->
+        </script>
     </body>
   </html>
   

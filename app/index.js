@@ -23,5 +23,6 @@ if (module.hot) {
       </AppContainer>,
       document.getElementById('toolsRoot')
     );
+    // render(<h1>dgj</h1>, document.getElementById('findroot'));
   });
 }

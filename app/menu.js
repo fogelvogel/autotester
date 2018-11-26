@@ -223,6 +223,7 @@ export default class MenuBuilder {
           click: () => {
             this.mainWindow.toggleDevTools();
             this.toolsWindow.toggleDevTools();
+            this.showAllWindow.toggleDevTools();
           }
         }
       ]

@@ -114,6 +114,7 @@ app.on('ready', async () => {
     }
     showAllWindow.show();
     showAllWindow.focus();
+    readDirectory();
   });
 
   mainWindow.on('closed', () => {
@@ -151,6 +152,7 @@ app.on('ready', async () => {
         );
       }
     );
+
     const menuBuilder = new MenuBuilder(mainWindow, toolsWindow, showAllWindow);
     const menu = menuBuilder.buildMenu();
     Menu.setApplicationMenu(menu);
@@ -227,7 +229,11 @@ app.on('ready', async () => {
     mainWindow.loadURL(`http://ya.ru`);
     console.log('testing window opened', args);
   }
-
+  function readDirectory() {
+    fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
+      showAllWindow.webContents.send('all files from directory', dir);
+    });
+  }
   ipcMain.on('new-mouse-click-event', clickFunction);
   ipcMain.on('new-mouse-doubleclick-event', doubleclickFunction);
 

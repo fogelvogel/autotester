@@ -12,7 +12,6 @@ const Routes = () => (
   <App>
     <Switch>
       <Route path={routes.TEST} component={ToolsBar} />
-      {/* <Route path={routes.FINDTESTS} component={FindTestsPage} /> */}
       <Route path={routes.HOME} component={Home} />
     </Switch>
   </App>
