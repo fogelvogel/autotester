@@ -25,6 +25,8 @@ let toolsWindow = null;
 let showAllWindow = null;
 
 global.savingName = { name: path.join(__dirname, `/tmp/test1`) };
+
+let navigationEnabled = true;
 // if (process.env.NODE_ENV === 'production') {
 //   const sourceMapSupport = require('source-map-support');
 //   sourceMapSupport.install();
@@ -74,9 +76,12 @@ app.on('ready', async () => {
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
-    height: 728
+    height: 728,
+    webPreferences: {
+      allowRunningInsecureContent: true,
+      webSecurity: false
+    }
   });
-
   // mainWindow.loadURL('https://ormatek.dev.sibirix.ru');
 
   toolsWindow = new BrowserWindow({
@@ -106,6 +111,9 @@ app.on('ready', async () => {
 
     toolsWindow.show();
     toolsWindow.focus();
+    const menuBuilder = new MenuBuilder(mainWindow, toolsWindow, showAllWindow);
+    const menu = menuBuilder.buildMenu();
+    Menu.setApplicationMenu(menu);
   });
 
   showAllWindow.webContents.on('did-finish-load', () => {
@@ -130,7 +138,7 @@ app.on('ready', async () => {
   });
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
-
+    console.log('main window loaded');
     fs.readFile(
       path.join(__dirname, 'script.js'),
       'utf8',
@@ -152,10 +160,6 @@ app.on('ready', async () => {
         );
       }
     );
-
-    const menuBuilder = new MenuBuilder(mainWindow, toolsWindow, showAllWindow);
-    const menu = menuBuilder.buildMenu();
-    Menu.setApplicationMenu(menu);
   });
 
   // let argsToString;
@@ -188,17 +192,23 @@ app.on('ready', async () => {
     toolsWindow.webContents.send('new test string available', args);
   }
   function keydownFunction(event, args) {
-    const testString = buildTestString('keydown', args);
-    toolsWindow.webContents.send('new test string available', testString);
+    if (navigationEnabled) {
+      const testString = buildTestString('keydown', args);
+      toolsWindow.webContents.send('new test string available', testString);
+    }
   }
   function keyupFunction(event, args) {
-    const testString = buildTestString('keyup', args);
-    toolsWindow.webContents.send('new test string available', testString);
+    if (navigationEnabled) {
+      const testString = buildTestString('keyup', args);
+      toolsWindow.webContents.send('new test string available', testString);
+    }
   }
 
   function doubleclickFunction(event, args) {
-    toolsWindow.webContents.send('need to delete previous two');
-    toolsWindow.webContents.send('new test string available', args);
+    if (navigationEnabled) {
+      toolsWindow.webContents.send('need to delete previous two');
+      toolsWindow.webContents.send('new test string available', args);
+    }
   }
 
   function saveTest(event, args) {
@@ -225,13 +235,16 @@ app.on('ready', async () => {
   }
 
   function loadTestingPage(event, args) {
-    // mainWindow.loadURL(args);
-    mainWindow.loadURL(`http://ya.ru`);
-    console.log('testing window opened', args);
+    if (args === null || args === '') {
+      mainWindow.loadURL(`https://yandex.ru`);
+    } else {
+      mainWindow.loadURL(args);
+    }
   }
   function readDirectory() {
     fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
-      showAllWindow.webContents.send('all files from directory', dir);
+      const files = dir.filter(el => el.match(/.*\.(txt)/gi));
+      showAllWindow.webContents.send('all files from directory', files);
     });
   }
   ipcMain.on('new-mouse-click-event', clickFunction);
@@ -245,6 +258,17 @@ app.on('ready', async () => {
   ipcMain.on('save-converted-test', saveConvertedTest);
   ipcMain.on('new-scroll', clickFunction);
   ipcMain.on('new-resize', clickFunction);
+  ipcMain.on('path to go', (event, args) => {
+    if (navigationEnabled) {
+      mainWindow.loadURL(args);
+    }
+  });
+  ipcMain.on('navigate', () => {
+    navigationEnabled = true;
+  });
+  ipcMain.on('do not navigate', () => {
+    navigationEnabled = false;
+  });
   ipcMain.on('need-to-reload', () => {
     mainWindow.reload();
   });

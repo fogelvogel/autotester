@@ -27,6 +27,13 @@ function getPathTo(element) {
 }
 
 window.onclick = e => {
+  const path = e.target.href;
+  if (path !== undefined) {
+    console.log(path);
+    e.stopPropagation();
+    e.preventDefault();
+    ipc.send('path to go', path);
+  }
   const tmp = getPathTo(e.target);
 
   const testingParams = [
