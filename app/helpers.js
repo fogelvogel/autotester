@@ -11,7 +11,7 @@ const ipc = require('electron').ipcRenderer;
 //   }
 //     console.log('file was written successfully');
 // });
-const keysArr = ['Meta', 'Control', 'Alt', 'Shift'];
+// const keysArr = ['Meta', 'Control', 'Alt', 'Shift'];
 // const webdriverKeys = ['command', 'ControlLeft', 'AltLeft', 'ShiftLeft'];
 
 export default function checkField(value: string) {
@@ -39,89 +39,6 @@ function saveOneString(testString) {
   return `${testString.actionName} ${attributes} ${paths}\n`;
 }
 
-function convertOneString(testString) {
-  switch (testString.actionName) {
-    case 'wait': {
-      if (testString.attributes.length > 1) {
-        return `await app.client.waitForExist('${testString.paths[0]}', ${
-          testString.attributes[1]
-        }, ${testString.attributes[0]});\n`;
-      }
-      return `await new Promise((resolve) => setTimeout(resolve, ${
-        testString.attributes[0]
-      }));\n`;
-    }
-    case 'click': {
-      if (testString.attributes.length > 1) {
-        return `await app.client.doubleClick('${testString.paths[0]}');\n`;
-      }
-      return `await app.client.click('${testString.paths[0]}');\n`;
-    }
-    case 'test': {
-      let testingStrings = '';
-      for (let i = 0; i < testString.attributes.length; i += 1) {
-        testingStrings += makeTestingString(
-          testString.attributes[i],
-          testString.paths
-        );
-      }
-      if (testingStrings === '') {
-        return `expect((await app.client.element('${
-          testString.paths
-        }')).value).not.toBeNull();\n`;
-      }
-      return testingStrings;
-    }
-    case 'keyup': {
-      const index = keysArr.findIndex(
-        element => element === testString.attributes[0]
-      );
-      if (index === -1) {
-        return '';
-      }
-      return `await app.client.keys('${testString.attributes[0]}').then();\n`;
-    }
-    case 'keydown': {
-      return `await app.client.keys('${testString.attributes[0]}').then();\n`;
-    }
-    default:
-      break;
-  }
-  return '';
-}
-function replaceNBSPs(str) {
-  const re = new RegExp(String.fromCharCode(160), 'g');
-  return str.replace(re, ' ');
-}
-function makeTestingString(attribute, paths) {
-  const attrib = attribute.split('=');
-  const sizes = attrib[1].split(' ');
-
-  switch (attrib[0]) {
-    case 'text': {
-      return `expect(await app.client.getText('${paths}')).toEqual('${replaceNBSPs(
-        attrib[1]
-      ).trim()}');\n`;
-    }
-    case 'size': {
-      return `expect(await app.client.getElementSize('${paths}')).toEqual({height: ${
-        sizes[0]
-      }, width: ${sizes[1]}});\n`;
-    }
-    case 'classes': {
-      return `expect(await app.client.getAttribute('${paths}', 'class')).toEqual('${
-        attrib[1]
-      }');\n`;
-    }
-    default:
-      break;
-  }
-}
 export function convertTest(state: autotesterStateType) {
-  const allTest = [];
-
-  for (let i = 0; i < state.testBody.length; i += 1) {
-    allTest[i] = convertOneString(state.testBody[i]);
-  }
-  ipc.send('save-converted-test', allTest);
+  ipc.send('save-converted-test', state.testBody);
 }
