@@ -2,13 +2,24 @@ const ReactDOM = require('react-dom');
 const React = require('react');
 const ipc = require('electron').ipcRenderer;
 
-let arrayOfNames = ['qwe', 'qweqwe'];
+let arrayOfNames = [];
+
+// const myElectron = require('electron');
+
+// const choice = myElectron.dialog.showMessageBox(
+//     myElectron.remote.getCurrentWindow(),
+//     {
+//     type: 'question',
+//     buttons: ['Yes', 'No'],
+//     title: 'Confirm',
+//     message: 'Are you sure you want to delete all files?'
+// });
 
 ipc.on('all files from directory', (event, args) => {
   // const len = args.lenght;
   arrayOfNames = [...args];
   ReactDOM.render(
-    React.createElement(FindTestsPage, []),
+    React.createElement(FindTestsPage, { filenames: arrayOfNames }),
     document.querySelector('#findroot')
   );
   // console.log(args);
@@ -17,6 +28,7 @@ ipc.on('all files from directory', (event, args) => {
   //     console.log('qwe', args[i]);
   // }
 });
+
 function substringSearch(str, sub) {
   const len = str.length;
   const subLen = sub.length;
@@ -32,7 +44,10 @@ function substringSearch(str, sub) {
   }
   return false;
 }
-function matchingNames(arrayOfFiles, sub) {
+function matchingNames(arrayOfFiles, sub = '') {
+  if (sub === '') {
+    return arrayOfFiles;
+  }
   const namesLen = arrayOfFiles.length;
   const matching = [];
   for (let i = 0; i < namesLen; i += 1) {
@@ -44,6 +59,24 @@ function matchingNames(arrayOfFiles, sub) {
   }
   return matching;
 }
+function deleteThisFile(number) {
+  ipc.send('delete file', arrayOfNames[number]);
+}
+
+function editThisFile(number) {
+  ipc.send('edit file', arrayOfNames[number]);
+}
+
+function convertThisFile(number) {
+  ipc.send('convert file', arrayOfNames[number]);
+}
+
+function convertAll() {}
+
+function deleteAll() {
+  ipc.send('delete all files');
+}
+
 class FindTestsPage extends React.Component {
   constructor(props) {
     super(props);
@@ -78,11 +111,11 @@ class FindTestsPage extends React.Component {
 
   filterRes() {
     const { input } = this.state;
-    console.log(input);
     this.setState({ filenames: matchingNames(arrayOfNames, input.value) });
   }
 
   render() {
+    // this.state = this.props;
     const { filenames } = this.state;
     return React.createElement(
       'div',
@@ -125,7 +158,8 @@ class FindTestsPage extends React.Component {
                 'button',
                 {
                   'data-tclass': 'btn',
-                  type: 'button'
+                  type: 'button',
+                  onClick: () => editThisFile(index)
                 },
                 'edit'
               )
@@ -137,7 +171,8 @@ class FindTestsPage extends React.Component {
                 'button',
                 {
                   'data-tclass': 'btn',
-                  type: 'button'
+                  type: 'button',
+                  onClick: () => convertThisFile(index)
                 },
                 'convert'
               )
@@ -149,7 +184,8 @@ class FindTestsPage extends React.Component {
                 'button',
                 {
                   'data-tclass': 'btn',
-                  type: 'button'
+                  type: 'button',
+                  onClick: () => deleteThisFile(index)
                 },
                 'delete'
               )
@@ -161,7 +197,8 @@ class FindTestsPage extends React.Component {
         'button',
         {
           'data-tclass': 'btn',
-          type: 'button'
+          type: 'button',
+          onClick: () => convertAll()
         },
         'convert all'
       ),
@@ -169,7 +206,8 @@ class FindTestsPage extends React.Component {
         'button',
         {
           'data-tclass': 'btn',
-          type: 'button'
+          type: 'button',
+          onClick: () => deleteAll()
         },
         'delete all'
       )

@@ -13,7 +13,7 @@
 // import { app, BrowserWindow } from 'electron';
 import { app, BrowserWindow, Menu } from 'electron';
 
-import fs from 'fs';
+import fs, { existsSync } from 'fs';
 import MenuBuilder from './menu';
 
 const path = require('path');
@@ -244,9 +244,52 @@ app.on('ready', async () => {
   function readDirectory() {
     fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
       const files = dir.filter(el => el.match(/.*\.(txt)/gi));
+
       showAllWindow.webContents.send('all files from directory', files);
     });
   }
+
+  function deleteFile(event, args) {
+    const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
+    if (existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    readDirectory();
+  }
+  function editFile(event, args) {
+    const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
+    const nameWithoutExtension = args.split('.');
+    if (existsSync(filePath)) {
+      console.log(global.savingName.name);
+      global.savingName.name = `${path.join(__dirname, '/tmp/')}${
+        nameWithoutExtension[0]
+      }`;
+      console.log(global.savingName.name);
+      fs.readFile(filePath, 'utf-8', (err, data) => {
+        toolsWindow.webContents.send('new test available', JSON.parse(data));
+      });
+    }
+    readDirectory();
+  }
+  function convertFile(event, args) {
+    const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
+    if (existsSync(filePath)) {
+      //
+    }
+    readDirectory();
+  }
+  function deleteAllFiles() {
+    const filePath = path.join(__dirname, '/tmp');
+    fs.readdir(filePath, (err, dir) => {
+      const files = dir.filter(el => el.match(/.*\.(txt)/gi));
+      const quantity = files.length;
+      for (let i = 0; i < quantity; i += 1) {
+        fs.unlinkSync(`${filePath}/${files[i]}`);
+      }
+    });
+    showAllWindow.webContents.send('all files from directory', []);
+  }
+
   ipcMain.on('new-mouse-click-event', clickFunction);
   ipcMain.on('new-mouse-doubleclick-event', doubleclickFunction);
 
@@ -258,6 +301,10 @@ app.on('ready', async () => {
   ipcMain.on('save-converted-test', saveConvertedTest);
   ipcMain.on('new-scroll', clickFunction);
   ipcMain.on('new-resize', clickFunction);
+  ipcMain.on('delete all files', deleteAllFiles);
+  ipcMain.on('delete file', deleteFile);
+  ipcMain.on('edit file', editFile);
+  ipcMain.on('convert file', convertFile);
   ipcMain.on('path to go', (event, args) => {
     if (navigationEnabled) {
       mainWindow.loadURL(args);
