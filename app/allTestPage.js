@@ -15,20 +15,6 @@ let arrayOfNames = [];
 //     message: 'Are you sure you want to delete all files?'
 // });
 
-ipc.on('all files from directory', (event, args) => {
-  // const len = args.lenght;
-  arrayOfNames = [...args];
-  ReactDOM.render(
-    React.createElement(FindTestsPage, { filenames: arrayOfNames }),
-    document.querySelector('#findroot')
-  );
-  // console.log(args);
-  // for (let i = 0; i < len; i += 1) {
-  //     arrayOfNames[i] = args[i];
-  //     console.log('qwe', args[i]);
-  // }
-});
-
 function substringSearch(str, sub) {
   const len = str.length;
   const subLen = sub.length;
@@ -86,9 +72,10 @@ class FindTestsPage extends React.Component {
   }
 
   componentDidMount() {
-    // this.filenames = [Math.random().toString(36).substring(7), 'name2', 'name3', 'name4', Math.random().toString(36).substring(7)];
-    // this.timerId = setInterval(() => this.tick(), 1000);
-    this.setState({ filenames: arrayOfNames });
+    ipc.on('all files from directory', (event, args) => {
+      arrayOfNames = [...args];
+      this.setState({ filenames: arrayOfNames });
+    });
   }
 
   //   componentDidUpdate(prevProps, prevState) {
@@ -214,3 +201,7 @@ class FindTestsPage extends React.Component {
     );
   }
 }
+ReactDOM.render(
+  React.createElement(FindTestsPage, { filenames: arrayOfNames }),
+  document.querySelector('#findroot')
+);
