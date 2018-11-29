@@ -158,7 +158,7 @@ export default class ToolsBar extends Component<Props> {
         <div>
           <h2 id="testField">Your test is here:</h2>
         </div>
-        <table border="1">
+        <table className="w3-table w3-bordered">
           <tr>
             <td>№</td>
             <td>action</td>
@@ -174,11 +174,10 @@ export default class ToolsBar extends Component<Props> {
               <td>{`${v.paths}`}</td>
               <td>
                 <button
-                  className={styles.btn}
                   onClick={() => {
                     deleteOneString(index + 1);
                   }}
-                  data-tclass="btn"
+                  className="w3-btn w3-red"
                   type="button"
                 >
                   X
@@ -191,25 +190,18 @@ export default class ToolsBar extends Component<Props> {
         <div>
           <div className={styles.btnGroup}>
             <button
-              className={styles.btn}
+              className="w3-btn w3-pink"
               onClick={waitForElement}
-              data-tclass="btn"
               type="button"
             >
               wait for smth
             </button>
-            <button
-              className={styles.btn}
-              onClick={fixData}
-              data-tclass="btn"
-              type="button"
-            >
+            <button className="w3-btn w3-pink" onClick={fixData} type="button">
               write action
             </button>
             <button
-              className={styles.btn}
+              className="w3-btn w3-pink"
               onClick={doTestAction}
-              data-tclass="btn"
               type="button"
             >
               test element
@@ -217,24 +209,22 @@ export default class ToolsBar extends Component<Props> {
           </div>
           <div>
             <button
-              className={styles.btn}
+              className="w3-btn w3-sand"
               onClick={clearTest}
-              data-tclass="btn"
               type="button"
             >
               clear test
             </button>
             <button
-              className={styles.btn}
+              className="w3-btn w3-sand"
               onClick={helpingFunction}
-              data-tclass="btn"
               type="button"
             >
               save test
             </button>
 
             <button
-              className={styles.btn}
+              className="w3-btn w3-sand"
               data-tclass="btn"
               type="button"
               onClick={helpConvertTest}
@@ -243,8 +233,7 @@ export default class ToolsBar extends Component<Props> {
             </button>
           </div>
           <button
-            className={styles.btn}
-            data-tclass="btn"
+            className="w3-btn w3-pink"
             type="button"
             onClick={() => ipc.send('show all tests in window')}
           >

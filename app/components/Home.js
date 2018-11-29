@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import routes from '../constants/routes';
-import styles from './Home.css';
+// import styles from './Home.css';
 // import * as URLAction from '../actions/home';
 // import * as Helper from '../helpers';
 
@@ -29,13 +29,18 @@ export default class Home extends Component<Props> {
 
   render() {
     return (
-      <div className={styles.container} data-tid="container">
+      <div className="w3-row w3-display-middle">
         <input
+          className="w3-input"
           ref={this.seInput}
           type="text"
           placeholder="Paste your link here"
         />
-        <button type="submit" onClick={this.saveTestingURl}>
+        <button
+          type="button"
+          className="w3-bar w3-pink"
+          onClick={this.saveTestingURl}
+        >
           <Link to={routes.TEST}>GO!</Link>
         </button>
       </div>
