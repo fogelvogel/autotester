@@ -305,13 +305,30 @@ export default class MenuBuilder {
         submenu: [
           {
             label: '&Open',
-            accelerator: 'Ctrl+O'
+            accelerator: 'Ctrl+O',
+            click: () => this.openFile()
+          },
+          {
+            label: '&Save',
+            accelerator: 'Ctrl+S',
+            click: () => this.save()
+          },
+          {
+            label: '&SaveAs',
+            accelerator: 'Shift+Ctrl+S',
+            click: () => this.saveFile()
+          },
+          {
+            label: '&ShowAll',
+            click: () => this.showAll()
           },
           {
             label: '&Close',
             accelerator: 'Ctrl+W',
             click: () => {
               this.mainWindow.close();
+              this.toolsWindow.close();
+              this.showAllWindow.close();
             }
           }
         ]
