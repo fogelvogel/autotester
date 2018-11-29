@@ -18,11 +18,13 @@ let arrayOfNames = [];
 function substringSearch(str, sub) {
   const len = str.length;
   const subLen = sub.length;
+
   for (let i = 0; i < len; i += 1) {
     for (let j = 0; j < subLen; j += 1) {
       if (str[i + j] !== sub[j]) {
         break;
       }
+
       if (j === subLen - 1) {
         return true;
       }
@@ -36,9 +38,11 @@ function matchingNames(arrayOfFiles, sub = '') {
   }
   const namesLen = arrayOfFiles.length;
   const matching = [];
+
   for (let i = 0; i < namesLen; i += 1) {
     const filename = arrayOfFiles[i].split('.');
     const str = filename[0].split('');
+
     if (substringSearch(str, sub)) {
       matching.push(arrayOfFiles[i]);
     }
@@ -78,20 +82,6 @@ class FindTestsPage extends React.Component {
     });
   }
 
-  //   componentDidUpdate(prevProps, prevState) {
-  //     if (prevState.filenames !== arrayOfNames) {
-  //       this.onUpdate();
-  //     }
-  //   }
-
-  componentWillUnmount() {
-    // clearInterval(this.timerId);
-  }
-
-  //   onUpdate() {
-  //     this.setState({ filenames: arrayOfNames });
-  //   }
-
   setInput(el) {
     this.setState({ input: el });
   }
@@ -102,8 +92,8 @@ class FindTestsPage extends React.Component {
   }
 
   render() {
-    // this.state = this.props;
     const { filenames } = this.state;
+
     return React.createElement(
       'div',
       null,

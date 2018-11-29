@@ -1,16 +1,5 @@
 /* eslint global-require: 0, flowtype-errors/show-errors: 0 */
 
-/**
- * This module executes inside of electron's main process. You can start
- * electron renderer process from here and communicate with the other processes
- * through IPC.
- *
- * When running `yarn build` or `yarn build-main`, this file is compiled to
- * `./app/main.prod.js` using webpack. This gives us some performance wins.
- *
- * @flow
- */
-// import { app, BrowserWindow } from 'electron';
 import { app, BrowserWindow, Menu } from 'electron';
 
 import fs, { existsSync } from 'fs';
@@ -28,52 +17,257 @@ global.savingName = { name: path.join(__dirname, `/tmp/test1`) };
 
 const keysArr = ['Meta', 'Control', 'Alt', 'Shift'];
 let navigationEnabled = true;
-// if (process.env.NODE_ENV === 'production') {
-//   const sourceMapSupport = require('source-map-support');
-//   sourceMapSupport.install();
-// }
+if (process.env.NODE_ENV === 'production') {
+  const sourceMapSupport = require('source-map-support');
+  sourceMapSupport.install();
+}
 
-// if (
-//   process.env.NODE_ENV === 'development' ||
-//   process.env.DEBUG_PROD === 'true'
-// ) {
-//   require('electron-debug')();
-//   const path = require('path');
-//   const p = path.join(__dirname, '..', 'app', 'node_modules');
-//   require('module').globalPaths.push(p);
-// }
+if (
+  process.env.NODE_ENV === 'development' ||
+  process.env.DEBUG_PROD === 'true'
+) {
+  require('electron-debug')();
+  const p = path.join(__dirname, '..', 'app', 'node_modules');
+  require('module').globalPaths.push(p);
+}
 
-// const installExtensions = async () => {
-//   const installer = require('electron-devtools-installer');
-//   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-//   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+const installExtensions = async () => {
+  const installer = require('electron-devtools-installer');
+  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
 
-//   return Promise.all(
-//     extensions.map(name => installer.default(installer[name], forceDownload))
-//   ).catch(console.log);
-// };
+  return Promise.all(
+    extensions.map(name => installer.default(installer[name], forceDownload))
+  ).catch(console.log);
+};
 
-/**
- * Add event listeners...
- */
+function convertTest(event, args) {
+  const allTest = [];
+  const testsCount = args.length;
+  for (let i = 0; i < testsCount; i += 1) {
+    allTest[i] = convertOneString(args[i]);
+  }
+  saveConvertedTest(allTest);
+}
+
+function makeTestingString(attribute, paths) {
+  const attrib = attribute.split('=');
+  const sizes = attrib[1].split(' ');
+
+  switch (attrib[0]) {
+    case 'text': {
+      return `expect(await app.client.getText('${paths}')).toEqual('${replaceNBSPs(
+        attrib[1]
+      ).trim()}');\n`;
+    }
+    case 'size': {
+      return `expect(await app.client.getElementSize('${paths}')).toEqual({height: ${
+        sizes[0]
+      }, width: ${sizes[1]}});\n`;
+    }
+    case 'classes': {
+      return `expect(await app.client.getAttribute('${paths}', 'class')).toEqual('${
+        attrib[1]
+      }');\n`;
+    }
+    default:
+      break;
+  }
+}
+
+function replaceNBSPs(str) {
+  const re = new RegExp(String.fromCharCode(160), 'g');
+  return str.replace(re, ' ');
+}
+
+function convertOneString(testString) {
+  switch (testString.actionName) {
+    case 'wait': {
+      if (testString.attributes.length > 1) {
+        return `await app.client.waitForExist('${testString.paths[0]}', ${
+          testString.attributes[1]
+        }, ${testString.attributes[0]});\n`;
+      }
+      return `await new Promise((resolve) => setTimeout(resolve, ${
+        testString.attributes[0]
+      }));\n`;
+    }
+    case 'click': {
+      if (testString.attributes.length > 1) {
+        return `await app.client.doubleClick('${testString.paths[0]}');\n`;
+      }
+      return `await app.client.click('${testString.paths[0]}');\n`;
+    }
+    case 'test': {
+      let testingStrings = '';
+      for (let i = 0; i < testString.attributes.length; i += 1) {
+        testingStrings += makeTestingString(
+          testString.attributes[i],
+          testString.paths
+        );
+      }
+      if (testingStrings === '') {
+        return `expect((await app.client.element('${
+          testString.paths
+        }')).value).not.toBeNull();\n`;
+      }
+      return testingStrings;
+    }
+    case 'keyup': {
+      const index = keysArr.findIndex(
+        element => element === testString.attributes[0]
+      );
+      if (index === -1) {
+        return '';
+      }
+      return `await app.client.keys('${testString.attributes[0]}').then();\n`;
+    }
+    case 'keydown': {
+      return `await app.client.keys('${testString.attributes[0]}').then();\n`;
+    }
+    default:
+      break;
+  }
+  return '';
+}
+// let argsToString;
+function buildTestString(type: string, params: string) {
+  const splittedParams = params.split(' ');
+  const newPaths = splittedParams[0].split('#');
+  const newAttributes = [...splittedParams];
+  newAttributes.shift();
+  const newString = {
+    actionName: type,
+    paths: newPaths,
+    attributes: newAttributes
+  };
+  return newString;
+}
+
+function clickFunction(event, args) {
+  if (!navigationEnabled) {
+    if (args.actionName === 'scroll' || args.actionName === 'resize') {
+      return;
+    }
+  }
+  toolsWindow.webContents.send('new test string available', args);
+}
+function keydownFunction(event, args) {
+  if (navigationEnabled) {
+    const testString = buildTestString('keydown', args);
+    toolsWindow.webContents.send('new test string available', testString);
+  }
+}
+function keyupFunction(event, args) {
+  if (navigationEnabled) {
+    const testString = buildTestString('keyup', args);
+    toolsWindow.webContents.send('new test string available', testString);
+  }
+}
+
+function doubleclickFunction(event, args) {
+  if (navigationEnabled) {
+    toolsWindow.webContents.send('need to delete previous two');
+    toolsWindow.webContents.send('new test string available', args);
+  }
+}
+
+function saveTest(event, args) {
+  const saveStream = fs.createWriteStream(`${global.savingName.name}.txt`);
+
+  const savingArr = JSON.stringify([...args]);
+  saveStream.write(savingArr);
+  saveStream.close();
+  readDirectory();
+}
+function saveConvertedTest(args) {
+  const fileNames = global.savingName.name.split('/');
+  const last = fileNames.pop();
+  const convertStream = fs.createWriteStream(
+    `${fileNames.join('/')}/converted/${last}-converted.txt`
+  );
+  const savingArr = [...args];
+  const arrLength = savingArr.length;
+
+  for (let i = 0; i < arrLength; i += 1) {
+    convertStream.write(savingArr[i]);
+  }
+}
+
+function loadTestingPage(event, args) {
+  if (args === null || args === '') {
+    mainWindow.loadURL(`https://yandex.ru`);
+  } else {
+    mainWindow.loadURL(args);
+  }
+}
+function readDirectory() {
+  fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
+    const files = dir.filter(el => el.match(/.*\.(txt)/gi));
+
+    showAllWindow.webContents.send('all files from directory', files);
+  });
+}
+
+function deleteFile(event, args) {
+  const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
+  if (existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+  readDirectory();
+}
+function editFile(event, args) {
+  const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
+  const nameWithoutExtension = args.split('.');
+
+  if (existsSync(filePath)) {
+    global.savingName.name = `${path.join(__dirname, '/tmp/')}${
+      nameWithoutExtension[0]
+    }`;
+
+    fs.readFile(filePath, 'utf-8', (err, data) => {
+      toolsWindow.webContents.send('new test available', JSON.parse(data));
+    });
+  }
+  readDirectory();
+}
+function convertFile(event, args) {
+  const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
+
+  if (existsSync(filePath)) {
+    fs.readFile(filePath, 'utf-8', (err, data) => {
+      convertTest(null, JSON.parse(data));
+    });
+  }
+  readDirectory();
+}
+function deleteAllFiles() {
+  const filePath = path.join(__dirname, '/tmp');
+  fs.readdir(filePath, (err, dir) => {
+    const files = dir.filter(el => el.match(/.*\.(txt)/gi));
+    const quantity = files.length;
+
+    for (let i = 0; i < quantity; i += 1) {
+      fs.unlinkSync(`${filePath}/${files[i]}`);
+    }
+  });
+  showAllWindow.webContents.send('all files from directory', []);
+}
 
 app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
 app.on('ready', async () => {
-  // if (
-  //   process.env.NODE_ENV === 'development' ||
-  //   process.env.DEBUG_PROD === 'true'
-  // ) {
-  //   await installExtensions();
-  // }
+  if (
+    process.env.NODE_ENV === 'development' ||
+    process.env.DEBUG_PROD === 'true'
+  ) {
+    await installExtensions();
+  }
 
-  // mainWindow.loadURL('https://ormatek.dev.sibirix.ru');
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
@@ -83,32 +277,25 @@ app.on('ready', async () => {
       webSecurity: false
     }
   });
-  // mainWindow.loadURL('https://ormatek.dev.sibirix.ru');
 
   toolsWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728
+    width: 700,
+    height: 700
   });
 
   showAllWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728
+    width: 500,
+    height: 700
   });
 
   toolsWindow.loadURL(`file://${__dirname}/tools.html`);
-  // mainWindow.loadURL(`http://ya.ru`);
 
-  // @TODO: Use 'ready-to-show' event
-  //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   toolsWindow.webContents.on('did-finish-load', () => {
     if (!toolsWindow) {
       throw new Error('"toolsWindow" is not defined');
     }
-    // if (process.env.START_MINIMIZED) {
-    //     toolsWindow.minimize();
-    // } else {
 
     toolsWindow.show();
     toolsWindow.focus();
@@ -139,7 +326,6 @@ app.on('ready', async () => {
   });
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
-    console.log('main window loaded');
     fs.readFile(
       path.join(__dirname, 'script.js'),
       'utf8',
@@ -155,231 +341,12 @@ app.on('ready', async () => {
           'script.setAttribute("type", "text/javascript")'
         );
         mainWindow.webContents.executeJavaScript(`script.innerHTML = "${d}"`);
-        // mainWindow.webContents.executeJavaScript(`script.innerHTML = "require('${path.join(__dirname, 'script.js')}')"`);
         mainWindow.webContents.executeJavaScript(
           'document.body.appendChild(script)'
         );
       }
     );
   });
-
-  function convertTest(event, args) {
-    const allTest = [];
-    const testsCount = args.length;
-    for (let i = 0; i < testsCount; i += 1) {
-      allTest[i] = convertOneString(args[i]);
-    }
-    saveConvertedTest(allTest);
-  }
-
-  function makeTestingString(attribute, paths) {
-    const attrib = attribute.split('=');
-    const sizes = attrib[1].split(' ');
-
-    switch (attrib[0]) {
-      case 'text': {
-        return `expect(await app.client.getText('${paths}')).toEqual('${replaceNBSPs(
-          attrib[1]
-        ).trim()}');\n`;
-      }
-      case 'size': {
-        return `expect(await app.client.getElementSize('${paths}')).toEqual({height: ${
-          sizes[0]
-        }, width: ${sizes[1]}});\n`;
-      }
-      case 'classes': {
-        return `expect(await app.client.getAttribute('${paths}', 'class')).toEqual('${
-          attrib[1]
-        }');\n`;
-      }
-      default:
-        break;
-    }
-  }
-
-  function replaceNBSPs(str) {
-    const re = new RegExp(String.fromCharCode(160), 'g');
-    return str.replace(re, ' ');
-  }
-
-  function convertOneString(testString) {
-    switch (testString.actionName) {
-      case 'wait': {
-        if (testString.attributes.length > 1) {
-          return `await app.client.waitForExist('${testString.paths[0]}', ${
-            testString.attributes[1]
-          }, ${testString.attributes[0]});\n`;
-        }
-        return `await new Promise((resolve) => setTimeout(resolve, ${
-          testString.attributes[0]
-        }));\n`;
-      }
-      case 'click': {
-        if (testString.attributes.length > 1) {
-          return `await app.client.doubleClick('${testString.paths[0]}');\n`;
-        }
-        return `await app.client.click('${testString.paths[0]}');\n`;
-      }
-      case 'test': {
-        let testingStrings = '';
-        for (let i = 0; i < testString.attributes.length; i += 1) {
-          testingStrings += makeTestingString(
-            testString.attributes[i],
-            testString.paths
-          );
-        }
-        if (testingStrings === '') {
-          return `expect((await app.client.element('${
-            testString.paths
-          }')).value).not.toBeNull();\n`;
-        }
-        return testingStrings;
-      }
-      case 'keyup': {
-        const index = keysArr.findIndex(
-          element => element === testString.attributes[0]
-        );
-        if (index === -1) {
-          return '';
-        }
-        return `await app.client.keys('${testString.attributes[0]}').then();\n`;
-      }
-      case 'keydown': {
-        return `await app.client.keys('${testString.attributes[0]}').then();\n`;
-      }
-      default:
-        break;
-    }
-    return '';
-  }
-  // let argsToString;
-  function buildTestString(type: string, params: string) {
-    const splittedParams = params.split(' ');
-    const newPaths = splittedParams[0].split('#');
-    const newAttributes = [...splittedParams];
-    newAttributes.shift();
-    const newString = {
-      actionName: type,
-      paths: newPaths,
-      attributes: newAttributes
-    };
-    return newString;
-  }
-  // function buildDelayTestString(params: string = '') {
-  //   let atr = params;
-  //   if (params === '') {
-  //     atr = '1000';
-  //   }
-  //   const newString = {
-  //     actionName: 'delay',
-  //     paths: null,
-  //     attributes: [atr]
-  //   };
-  //   return newString;
-  // }
-
-  function clickFunction(event, args) {
-    toolsWindow.webContents.send('new test string available', args);
-  }
-  function keydownFunction(event, args) {
-    if (navigationEnabled) {
-      const testString = buildTestString('keydown', args);
-      toolsWindow.webContents.send('new test string available', testString);
-    }
-  }
-  function keyupFunction(event, args) {
-    if (navigationEnabled) {
-      const testString = buildTestString('keyup', args);
-      toolsWindow.webContents.send('new test string available', testString);
-    }
-  }
-
-  function doubleclickFunction(event, args) {
-    if (navigationEnabled) {
-      toolsWindow.webContents.send('need to delete previous two');
-      toolsWindow.webContents.send('new test string available', args);
-    }
-  }
-
-  function saveTest(event, args) {
-    const saveStream = fs.createWriteStream(`${global.savingName.name}.txt`);
-
-    const savingArr = JSON.stringify([...args]);
-    saveStream.write(savingArr);
-    saveStream.close();
-    // for (let i = 0; i < savingArr.length; i += 1) {
-    //   a.write(savingArr[i]);
-    // }
-  }
-  function saveConvertedTest(args) {
-    const fileNames = global.savingName.name.split('/');
-    const last = fileNames.pop();
-    const convertStream = fs.createWriteStream(
-      `${fileNames.join('/')}/converted/${last}-converted.txt`
-    );
-    const savingArr = [...args];
-    const arrLength = savingArr.length;
-    for (let i = 0; i < arrLength; i += 1) {
-      convertStream.write(savingArr[i]);
-    }
-  }
-
-  function loadTestingPage(event, args) {
-    if (args === null || args === '') {
-      mainWindow.loadURL(`https://yandex.ru`);
-    } else {
-      mainWindow.loadURL(args);
-    }
-  }
-  function readDirectory() {
-    fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
-      const files = dir.filter(el => el.match(/.*\.(txt)/gi));
-
-      showAllWindow.webContents.send('all files from directory', files);
-    });
-  }
-
-  function deleteFile(event, args) {
-    const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
-    if (existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-    readDirectory();
-  }
-  function editFile(event, args) {
-    const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
-    const nameWithoutExtension = args.split('.');
-    if (existsSync(filePath)) {
-      global.savingName.name = `${path.join(__dirname, '/tmp/')}${
-        nameWithoutExtension[0]
-      }`;
-
-      fs.readFile(filePath, 'utf-8', (err, data) => {
-        toolsWindow.webContents.send('new test available', JSON.parse(data));
-      });
-    }
-    readDirectory();
-  }
-  function convertFile(event, args) {
-    const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
-    if (existsSync(filePath)) {
-      fs.readFile(filePath, 'utf-8', (err, data) => {
-        convertTest(null, JSON.parse(data));
-      });
-    }
-    readDirectory();
-  }
-  function deleteAllFiles() {
-    const filePath = path.join(__dirname, '/tmp');
-    fs.readdir(filePath, (err, dir) => {
-      const files = dir.filter(el => el.match(/.*\.(txt)/gi));
-      const quantity = files.length;
-      for (let i = 0; i < quantity; i += 1) {
-        fs.unlinkSync(`${filePath}/${files[i]}`);
-      }
-    });
-    showAllWindow.webContents.send('all files from directory', []);
-  }
 
   ipcMain.on('new-mouse-click-event', clickFunction);
   ipcMain.on('new-mouse-doubleclick-event', doubleclickFunction);
@@ -389,7 +356,6 @@ app.on('ready', async () => {
 
   ipcMain.on('new-url-event', loadTestingPage);
   ipcMain.on('save-test', saveTest);
-  //   ipcMain.on('save-converted-test', saveConvertedTest);
   ipcMain.on('new-scroll', clickFunction);
   ipcMain.on('new-resize', clickFunction);
   ipcMain.on('save-converted-test', convertTest);
