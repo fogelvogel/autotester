@@ -4,17 +4,6 @@ const ipc = require('electron').ipcRenderer;
 
 let arrayOfNames = [];
 
-// const myElectron = require('electron');
-
-// const choice = myElectron.dialog.showMessageBox(
-//     myElectron.remote.getCurrentWindow(),
-//     {
-//     type: 'question',
-//     buttons: ['Yes', 'No'],
-//     title: 'Confirm',
-//     message: 'Are you sure you want to delete all files?'
-// });
-
 function substringSearch(str, sub) {
   const len = str.length;
   const subLen = sub.length;

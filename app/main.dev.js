@@ -1,6 +1,6 @@
 /* eslint global-require: 0, flowtype-errors/show-errors: 0 */
 
-import { app, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow, Menu, dialog } from 'electron';
 
 import fs, { existsSync } from 'fs';
 import MenuBuilder from './menu';
@@ -9,14 +9,28 @@ const path = require('path');
 
 const { ipcMain } = require('electron');
 
+// in this window you will see page which is being tested
+// в этом окне отображается тестируемая страница
 let mainWindow = null;
+
+// in this window you can choose mode to build your test
+// в этом окне отображается панель инструментов для создания теста
 let toolsWindow = null;
+
+// in this page you can see all your tests and convert them
+// в этом окне вы можете посмотреть все написанные тесты
 let showAllWindow = null;
 
 global.savingName = { name: path.join(__dirname, `/tmp/test1`) };
 
+// this keys are being toggled by webdriver function "keys"
+// эти клавиши функция вебдрайвера "keys" тогглит а не просто нажимает
 const keysArr = ['Meta', 'Control', 'Alt', 'Shift'];
+
+// should testing page be navigated by clicks (also affects on writing some actions to test)
+// должна ли быть включена навигация на тестируемой странице (также влияет на запись некоторых действий)
 let navigationEnabled = true;
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -242,16 +256,26 @@ function convertFile(event, args) {
   readDirectory();
 }
 function deleteAllFiles() {
-  const filePath = path.join(__dirname, '/tmp');
-  fs.readdir(filePath, (err, dir) => {
-    const files = dir.filter(el => el.match(/.*\.(txt)/gi));
-    const quantity = files.length;
+  dialog.showMessageBox(
+    {
+      message: 'Do you want to delete all test files?',
+      buttons: ['Ok', 'Cancel']
+    },
+    button => {
+      if (button === 0) {
+        const filePath = path.join(__dirname, '/tmp');
+        fs.readdir(filePath, (err, dir) => {
+          const files = dir.filter(el => el.match(/.*\.(txt)/gi));
+          const quantity = files.length;
 
-    for (let i = 0; i < quantity; i += 1) {
-      fs.unlinkSync(`${filePath}/${files[i]}`);
+          for (let i = 0; i < quantity; i += 1) {
+            fs.unlinkSync(`${filePath}/${files[i]}`);
+          }
+        });
+        showAllWindow.webContents.send('all files from directory', []);
+      }
     }
-  });
-  showAllWindow.webContents.send('all files from directory', []);
+  );
 }
 
 app.on('window-all-closed', () => {
