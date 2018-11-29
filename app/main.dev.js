@@ -193,6 +193,10 @@ function saveTest(event, args) {
   saveStream.write(savingArr);
   saveStream.close();
   readDirectory();
+  dialog.showMessageBox({
+    message: `Test was saved to ${global.savingName.name}`,
+    buttons: ['Ok']
+  });
 }
 function saveConvertedTest(args) {
   const fileNames = global.savingName.name.split('/');
@@ -244,6 +248,7 @@ function editFile(event, args) {
     });
   }
   readDirectory();
+  toolsWindow.focus();
 }
 function convertFile(event, args) {
   const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
@@ -254,8 +259,12 @@ function convertFile(event, args) {
     });
   }
   readDirectory();
+  dialog.showMessageBox({
+    message: 'Test was converted',
+    buttons: ['Ok']
+  });
 }
-function deleteAllFiles() {
+function deleteAllFiles(event, args) {
   dialog.showMessageBox(
     {
       message: 'Do you want to delete all test files?',
@@ -264,15 +273,19 @@ function deleteAllFiles() {
     button => {
       if (button === 0) {
         const filePath = path.join(__dirname, '/tmp');
-        fs.readdir(filePath, (err, dir) => {
-          const files = dir.filter(el => el.match(/.*\.(txt)/gi));
-          const quantity = files.length;
+        // fs.readdir(filePath, (err, dir) => {
+        //   const files = dir.filter(el => el.match(/.*\.(txt)/gi));
+        const quantity = args.length;
 
-          for (let i = 0; i < quantity; i += 1) {
-            fs.unlinkSync(`${filePath}/${files[i]}`);
-          }
+        for (let i = 0; i < quantity; i += 1) {
+          fs.unlinkSync(`${filePath}/${args[i]}`);
+        }
+        // });
+        fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
+          const files = dir.filter(el => el.match(/.*\.(txt)/gi));
+
+          showAllWindow.webContents.send('all files from directory', files);
         });
-        showAllWindow.webContents.send('all files from directory', []);
       }
     }
   );
@@ -384,6 +397,7 @@ app.on('ready', async () => {
   ipcMain.on('new-resize', clickFunction);
   ipcMain.on('save-converted-test', convertTest);
   ipcMain.on('delete all files', deleteAllFiles);
+  ipcMain.on('convert all files', deleteAllFiles);
   ipcMain.on('delete file', deleteFile);
   ipcMain.on('edit file', editFile);
   ipcMain.on('convert file', convertFile);

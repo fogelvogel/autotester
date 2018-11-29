@@ -1,8 +1,9 @@
 // @flow
-import { app, Menu, shell, BrowserWindow, dialog } from 'electron';
+import { app, Menu, shell, BrowserWindow, dialog, ipcMain } from 'electron';
 // import fs from 'fs';
 const fs = require('fs');
 const path = require('path');
+
 // import { saveTestToFile } from './helpers';
 // import { getStore } from './initialState';
 
@@ -79,6 +80,8 @@ export default class MenuBuilder {
     this.mainWindow = mainWindow;
     this.toolsWindow = toolsWindow;
     this.showAllWindow = showAllWindow;
+    this.showAll = this.showAll.bind(this);
+    ipcMain.on('show all tests in window', this.showAll);
   }
 
   buildMenu() {

@@ -50,12 +50,6 @@ function convertThisFile(number) {
   ipc.send('convert file', arrayOfNames[number]);
 }
 
-function convertAll() {}
-
-function deleteAll() {
-  ipc.send('delete all files');
-}
-
 class FindTestsPage extends React.Component {
   constructor(props) {
     super(props);
@@ -78,6 +72,16 @@ class FindTestsPage extends React.Component {
   filterRes() {
     const { input } = this.state;
     this.setState({ filenames: matchingNames(arrayOfNames, input.value) });
+  }
+
+  deleteAll() {
+    const { filenames } = this.state;
+    ipc.send('delete all files', filenames);
+  }
+
+  convertAll() {
+    const { filenames } = this.state;
+    ipc.send('convert all files', filenames);
   }
 
   render() {
@@ -164,7 +168,7 @@ class FindTestsPage extends React.Component {
         {
           'data-tclass': 'btn',
           type: 'button',
-          onClick: () => convertAll()
+          onClick: () => this.convertAll()
         },
         'convert all'
       ),
@@ -173,7 +177,7 @@ class FindTestsPage extends React.Component {
         {
           'data-tclass': 'btn',
           type: 'button',
-          onClick: () => deleteAll()
+          onClick: () => this.deleteAll()
         },
         'delete all'
       )

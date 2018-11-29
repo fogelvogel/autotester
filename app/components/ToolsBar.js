@@ -232,9 +232,7 @@ export default class ToolsBar extends Component<Props> {
             >
               save test
             </button>
-            <button className={styles.btn} data-tclass="btn" type="button">
-              run test
-            </button>
+
             <button
               className={styles.btn}
               data-tclass="btn"
@@ -244,6 +242,14 @@ export default class ToolsBar extends Component<Props> {
               convert test
             </button>
           </div>
+          <button
+            className={styles.btn}
+            data-tclass="btn"
+            type="button"
+            onClick={() => ipc.send('show all tests in window')}
+          >
+            show all tests
+          </button>
         </div>
         <DrawAdditionalFields mode={mode} />
       </div>
