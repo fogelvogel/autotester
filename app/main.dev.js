@@ -63,6 +63,14 @@ function convertTest(event, args) {
   }
   saveConvertedTest(allTest);
 }
+function convertTestWOSavedName(event, args, name) {
+  const allTest = [];
+  const testsCount = args.length;
+  for (let i = 0; i < testsCount; i += 1) {
+    allTest[i] = convertOneString(args[i]);
+  }
+  saveConvertedTestWOsavedName(allTest, name);
+}
 
 function makeTestingString(attribute, paths) {
   const attrib = attribute.split('=');
@@ -211,6 +219,20 @@ function saveConvertedTest(args) {
     convertStream.write(savingArr[i]);
   }
 }
+function saveConvertedTestWOsavedName(args, name) {
+  const fileNames = global.savingName.name.split('/');
+  fileNames.pop();
+  const testName = name.split('.');
+  const convertStream = fs.createWriteStream(
+    `${fileNames.join('/')}/converted/${testName[0]}-converted.txt`
+  );
+  const savingArr = [...args];
+  const arrLength = savingArr.length;
+
+  for (let i = 0; i < arrLength; i += 1) {
+    convertStream.write(savingArr[i]);
+  }
+}
 
 function loadTestingPage(event, args) {
   if (args === null || args === '') {
@@ -250,19 +272,28 @@ function editFile(event, args) {
   readDirectory();
   toolsWindow.focus();
 }
-function convertFile(event, args) {
+function convertFile(event, args, show = true) {
   const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
-
   if (existsSync(filePath)) {
     fs.readFile(filePath, 'utf-8', (err, data) => {
       convertTest(null, JSON.parse(data));
     });
   }
   readDirectory();
-  dialog.showMessageBox({
-    message: 'Test was converted',
-    buttons: ['Ok']
-  });
+  if (show) {
+    dialog.showMessageBox({
+      message: `Test ${args} was converted`,
+      buttons: ['Ok']
+    });
+  }
+}
+function convertFileWOSavedName(args) {
+  const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
+  if (existsSync(filePath)) {
+    fs.readFile(filePath, 'utf-8', (err, data) => {
+      convertTestWOSavedName(null, JSON.parse(data), args);
+    });
+  }
 }
 function deleteAllFiles(event, args) {
   dialog.showMessageBox(
@@ -289,6 +320,20 @@ function deleteAllFiles(event, args) {
       }
     }
   );
+}
+
+function convertAllFiles() {
+  fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
+    const files = dir.filter(el => el.match(/.*\.(txt)/gi));
+    const quantity = files.length;
+    for (let i = 0; i < quantity; i += 1) {
+      convertFileWOSavedName(files[i]);
+    }
+  });
+  dialog.showMessageBox({
+    message: `All tests were converted`,
+    buttons: ['Ok']
+  });
 }
 
 app.on('window-all-closed', () => {
@@ -397,7 +442,7 @@ app.on('ready', async () => {
   ipcMain.on('new-resize', clickFunction);
   ipcMain.on('save-converted-test', convertTest);
   ipcMain.on('delete all files', deleteAllFiles);
-  ipcMain.on('convert all files', deleteAllFiles);
+  ipcMain.on('convert all files', convertAllFiles);
   ipcMain.on('delete file', deleteFile);
   ipcMain.on('edit file', editFile);
   ipcMain.on('convert file', convertFile);
