@@ -290,26 +290,9 @@ function editFile(event, args) {
   toolsWindow.focus();
 }
 
-// конвертация открытого в данный момент теста
-// тесту не обязательно быть сохраненным, строки теста приходят в функцию в args
-function convertFile(event, args) {
-  const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
-  if (existsSync(filePath)) {
-    fs.readFile(filePath, 'utf-8', (err, data) => {
-      convertTest(null, JSON.parse(data));
-    });
-  }
-  // отправка в окно файлов текущие названия файлов в папке
-  readDirectory();
-  // окошко подтверждения сохранения файла
-  dialog.showMessageBox({
-    message: `Test ${args} was converted`,
-    buttons: ['Ok']
-  });
-}
 // конвертация файла без использования глобальной переменной текущего открытого файла
 // нужна чтобы конвертировать любой выбранный файл, а не только тот, который открыт
-function convertFileWOSavedName(args) {
+function convertFileWOSavedName(event, args) {
   const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
   if (existsSync(filePath)) {
     fs.readFile(filePath, 'utf-8', (err, data) => {
@@ -347,16 +330,26 @@ function deleteAllFiles(event, args) {
 
 // функция вызывается из окна с файлами тестов и конвертирует все файлы в папке
 function convertAllFiles() {
+  let quantity = null;
   fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
     const files = dir.filter(el => el.match(/.*\.(txt)/gi));
-    const quantity = files.length;
+    quantity = files.length;
+
     for (let i = 0; i < quantity; i += 1) {
-      convertFileWOSavedName(files[i]);
+      convertFileWOSavedName(null, files[i]);
     }
-  });
-  dialog.showMessageBox({
-    message: `All tests were converted`,
-    buttons: ['Ok']
+    let mess;
+
+    if (quantity !== null && quantity !== 0) {
+      mess = 'All tests were converted';
+    } else {
+      mess = 'No tests were converted';
+    }
+
+    dialog.showMessageBox({
+      message: mess,
+      buttons: ['Ok']
+    });
   });
 }
 
@@ -476,7 +469,8 @@ app.on('ready', async () => {
   // редактировать выбранный файл
   ipcMain.on('edit file', editFile);
   // конвертировать выбранный файл
-  ipcMain.on('convert file', convertFile);
+
+  ipcMain.on('convert file', convertFileWOSavedName);
   // загрузка тест. страницы с новым url после перехода по ссылке
   ipcMain.on('path to go', (event, args) => {
     if (navigationEnabled) {

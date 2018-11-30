@@ -38,16 +38,16 @@ function matchingNames(arrayOfFiles, sub = '') {
   }
   return matching;
 }
-function deleteThisFile(number) {
-  ipc.send('delete file', arrayOfNames[number]);
+function deleteThisFile(name) {
+  ipc.send('delete file', name);
 }
 
-function editThisFile(number) {
-  ipc.send('edit file', arrayOfNames[number]);
+function editThisFile(name) {
+  ipc.send('edit file', name);
 }
 
-function convertThisFile(number) {
-  ipc.send('convert file', arrayOfNames[number]);
+function convertThisFile(name) {
+  ipc.send('convert file', name);
 }
 
 class FindTestsPage extends React.Component {
@@ -133,7 +133,7 @@ class FindTestsPage extends React.Component {
                   'data-tclass': 'btn',
                   type: 'button',
                   className: 'w3-btn w3-sand',
-                  onClick: () => editThisFile(index)
+                  onClick: () => editThisFile(v)
                 },
                 'edit'
               )
@@ -147,7 +147,7 @@ class FindTestsPage extends React.Component {
                   'data-tclass': 'btn',
                   type: 'button',
                   className: 'w3-btn w3-sand',
-                  onClick: () => convertThisFile(index)
+                  onClick: () => convertThisFile(v)
                 },
                 'convert'
               )
@@ -161,7 +161,7 @@ class FindTestsPage extends React.Component {
                   'data-tclass': 'btn',
                   type: 'button',
                   className: 'w3-btn w3-red',
-                  onClick: () => deleteThisFile(index)
+                  onClick: () => deleteThisFile(v)
                 },
                 'delete'
               )
