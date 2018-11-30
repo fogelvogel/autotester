@@ -158,8 +158,8 @@ export default class ToolsBar extends Component<Props> {
         <div>
           <h2 id="testField">Your test is here:</h2>
         </div>
-        <table className="w3-table w3-bordered">
-          <tr>
+        <table className="w3-table w3-bordered w3-margin-top w3-margin-bottom">
+          <tr className="w3-pink">
             <td>№</td>
             <td>action</td>
             <td>atribute</td>
@@ -171,7 +171,7 @@ export default class ToolsBar extends Component<Props> {
               <td>{index + 1}</td>
               <td>{`${v.actionName}`}</td>
               <td>{`${v.attributes}`}</td>
-              <td>{`${v.paths}`}</td>
+              <td className="to-scroll">{`${v.paths}`}</td>
               <td>
                 <button
                   onClick={() => {
@@ -209,14 +209,14 @@ export default class ToolsBar extends Component<Props> {
           </div>
           <div>
             <button
-              className="w3-btn w3-sand"
+              className="w3-btn w3-red w3-margin-top"
               onClick={clearTest}
               type="button"
             >
               clear test
             </button>
             <button
-              className="w3-btn w3-sand"
+              className="w3-btn w3-sand w3-margin-top"
               onClick={helpingFunction}
               type="button"
             >
@@ -224,7 +224,7 @@ export default class ToolsBar extends Component<Props> {
             </button>
 
             <button
-              className="w3-btn w3-sand"
+              className="w3-btn w3-sand w3-margin-top"
               data-tclass="btn"
               type="button"
               onClick={helpConvertTest}
@@ -233,7 +233,7 @@ export default class ToolsBar extends Component<Props> {
             </button>
           </div>
           <button
-            className="w3-btn w3-pink"
+            className="w3-btn w3-pink w3-margin-top"
             type="button"
             onClick={() => ipc.send('show all tests in window')}
           >
@@ -293,16 +293,35 @@ function DrawAdditionalFields(props) {
           <h3>
             Type delay in milliseconds or pick element, that needs to be wated
           </h3>
-          <input type="text" placeholder="1000" ref={setDelay} />
-          <button type="button" onClick={addDelayString}>
+          <input
+            type="text"
+            placeholder="1000"
+            ref={setDelay}
+            className="w3-input w3-half"
+          />
+          <button
+            type="button"
+            onClick={addDelayString}
+            className="w3-btn w3-pink w3-half"
+          >
             Add delay
           </button>
           <h3>or</h3>
           <label htmlFor="isExisting">
-            <input type="checkbox" name="isExisting" ref={setExists} />
+            <input
+              type="checkbox"
+              name="isExisting"
+              ref={setExists}
+              className="w3-check"
+            />
             element exists
           </label>
-          <input type="text" placeholder="5000" ref={setWait} />
+          <input
+            type="text"
+            placeholder="5000"
+            ref={setWait}
+            className="w3-input"
+          />
           <div>
             <p>
               if you want to wait for some element to exist pick an element by
@@ -316,7 +335,7 @@ function DrawAdditionalFields(props) {
       return (
         <div>
           <h3>Do something witn your page</h3>
-          <p>click anythere, type something or resize testing page window</p>
+          <p>click anywhere, type something or resize testing page window</p>
         </div>
       );
     }
@@ -325,21 +344,36 @@ function DrawAdditionalFields(props) {
         <div>
           <h3>Test some values</h3>
           <label htmlFor="text">
-            <input type="checkbox" name="text" ref={setText} />
+            <input
+              type="checkbox"
+              name="text"
+              ref={setText}
+              className="w3-check"
+            />
             Text
           </label>
           <label htmlFor="size">
-            <input type="checkbox" name="size" ref={setSize} />
+            <input
+              type="checkbox"
+              name="size"
+              ref={setSize}
+              className="w3-check"
+            />
             Size
           </label>
           <label htmlFor="classes">
-            <input type="checkbox" name="classes" ref={setClasses} />
+            <input
+              type="checkbox"
+              name="classes"
+              ref={setClasses}
+              className="w3-check"
+            />
             Classes
           </label>
-          <label htmlFor="attribute">
-            <input type="checkbox" name="attribute" />
+          {/* <label htmlFor="attribute">
+            <input type="checkbox" name="attribute" className="w3-check"/>
             Attribute
-          </label>
+          </label> */}
           <p>
             pick the characteristics, that you want to be tested, then pick an
             element by your cursor

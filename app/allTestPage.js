@@ -92,6 +92,8 @@ class FindTestsPage extends React.Component {
       null,
       React.createElement('input', {
         type: 'text',
+        className: 'w3-input',
+        placeholder: 'Search by file name',
         ref: this.setInput
       }),
       React.createElement(
@@ -99,16 +101,17 @@ class FindTestsPage extends React.Component {
         {
           'data-tclass': 'btn',
           type: 'button',
+          className: 'w3-bar w3-sand',
           onClick: this.filterRes
         },
         'filter'
       ),
       React.createElement(
         'table',
-        { border: '1' },
+        { className: 'w3-table w3-bordered w3-margin-top' },
         React.createElement(
           'tr',
-          null,
+          { className: 'w3-pink' },
           React.createElement('td', null, '\u2116'),
           React.createElement('td', null, 'file name'),
           React.createElement('td', null, 'edit'),
@@ -129,6 +132,7 @@ class FindTestsPage extends React.Component {
                 {
                   'data-tclass': 'btn',
                   type: 'button',
+                  className: 'w3-btn w3-sand',
                   onClick: () => editThisFile(index)
                 },
                 'edit'
@@ -142,6 +146,7 @@ class FindTestsPage extends React.Component {
                 {
                   'data-tclass': 'btn',
                   type: 'button',
+                  className: 'w3-btn w3-sand',
                   onClick: () => convertThisFile(index)
                 },
                 'convert'
@@ -155,6 +160,7 @@ class FindTestsPage extends React.Component {
                 {
                   'data-tclass': 'btn',
                   type: 'button',
+                  className: 'w3-btn w3-red',
                   onClick: () => deleteThisFile(index)
                 },
                 'delete'
@@ -168,6 +174,7 @@ class FindTestsPage extends React.Component {
         {
           'data-tclass': 'btn',
           type: 'button',
+          className: 'w3-btn w3-sand w3-margin-top',
           onClick: () => this.convertAll()
         },
         'convert all'
@@ -177,6 +184,7 @@ class FindTestsPage extends React.Component {
         {
           'data-tclass': 'btn',
           type: 'button',
+          className: 'w3-btn w3-red w3-margin-top',
           onClick: () => this.deleteAll()
         },
         'delete all'

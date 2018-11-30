@@ -21,6 +21,7 @@ let toolsWindow = null;
 // в этом окне вы можете посмотреть все написанные тесты
 let showAllWindow = null;
 
+// глобальная переменная хранит полное имя текущего открытого файла
 global.savingName = { name: path.join(__dirname, `/tmp/test1`) };
 
 // this keys are being toggled by webdriver function "keys"
@@ -54,7 +55,7 @@ const installExtensions = async () => {
     extensions.map(name => installer.default(installer[name], forceDownload))
   ).catch(console.log);
 };
-
+// эта функция применяется для конвертации открытого теста
 function convertTest(event, args) {
   const allTest = [];
   const testsCount = args.length;
@@ -63,6 +64,7 @@ function convertTest(event, args) {
   }
   saveConvertedTest(allTest);
 }
+// эта функция для конвертации не открытого теста
 function convertTestWOSavedName(event, args, name) {
   const allTest = [];
   const testsCount = args.length;
@@ -71,7 +73,7 @@ function convertTestWOSavedName(event, args, name) {
   }
   saveConvertedTestWOsavedName(allTest, name);
 }
-
+// функция делает строки, содержащие expect
 function makeTestingString(attribute, paths) {
   const attrib = attribute.split('=');
   const sizes = attrib[1].split(' ');
@@ -97,11 +99,12 @@ function makeTestingString(attribute, paths) {
   }
 }
 
+// функция превращает nbsp в пробелы
 function replaceNBSPs(str) {
   const re = new RegExp(String.fromCharCode(160), 'g');
   return str.replace(re, ' ');
 }
-
+// функция переводит одну строку теста в виде объекта в строку, пригодную для запуска в spectron и jest
 function convertOneString(testString) {
   switch (testString.actionName) {
     case 'wait': {
@@ -152,7 +155,8 @@ function convertOneString(testString) {
   }
   return '';
 }
-// let argsToString;
+// подпрограмма помогает собирать строку теста из объекта, приходящего из тест. страницы
+// практически не используется
 function buildTestString(type: string, params: string) {
   const splittedParams = params.split(' ');
   const newPaths = splittedParams[0].split('#');
@@ -165,7 +169,7 @@ function buildTestString(type: string, params: string) {
   };
   return newString;
 }
-
+// отправляется сообщение что произошел клик в тестируемую страницу
 function clickFunction(event, args) {
   if (!navigationEnabled) {
     if (args.actionName === 'scroll' || args.actionName === 'resize') {
@@ -174,26 +178,31 @@ function clickFunction(event, args) {
   }
   toolsWindow.webContents.send('new test string available', args);
 }
+// отправляется сообщение о том что произошло событие нажатия клавиши на тест. странице
 function keydownFunction(event, args) {
   if (navigationEnabled) {
     const testString = buildTestString('keydown', args);
     toolsWindow.webContents.send('new test string available', testString);
   }
 }
+// отправляется сообщение о том что произошло событие отпускания клавиши на тест. странице
 function keyupFunction(event, args) {
   if (navigationEnabled) {
     const testString = buildTestString('keyup', args);
     toolsWindow.webContents.send('new test string available', testString);
   }
 }
-
+// сообщение о том, что произошел даблклик в тестуруемую страницу
+// отправляется в окно с инструментами
 function doubleclickFunction(event, args) {
   if (navigationEnabled) {
+    // сообщение что надо удалить два пердыдущих клика т.к. даблклик генерирует три события,
+    // два из которых (два обычных клика) надо проигнорировать
     toolsWindow.webContents.send('need to delete previous two');
     toolsWindow.webContents.send('new test string available', args);
   }
 }
-
+// сохранение текущего открытого теста
 function saveTest(event, args) {
   const saveStream = fs.createWriteStream(`${global.savingName.name}.txt`);
 
@@ -206,6 +215,8 @@ function saveTest(event, args) {
     buttons: ['Ok']
   });
 }
+// конвертировать текущий открытый тест
+// в аргументах - строки теста
 function saveConvertedTest(args) {
   const fileNames = global.savingName.name.split('/');
   const last = fileNames.pop();
@@ -219,6 +230,7 @@ function saveConvertedTest(args) {
     convertStream.write(savingArr[i]);
   }
 }
+// сохранить тест не используя глобальную переменную имени файла
 function saveConvertedTestWOsavedName(args, name) {
   const fileNames = global.savingName.name.split('/');
   fileNames.pop();
@@ -233,7 +245,7 @@ function saveConvertedTestWOsavedName(args, name) {
     convertStream.write(savingArr[i]);
   }
 }
-
+// тестируемая страница загружается в главное окно
 function loadTestingPage(event, args) {
   if (args === null || args === '') {
     mainWindow.loadURL(`https://yandex.ru`);
@@ -241,6 +253,7 @@ function loadTestingPage(event, args) {
     mainWindow.loadURL(args);
   }
 }
+// функция стчитывает тестовые файлы и отправляет их в окно файлов
 function readDirectory() {
   fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
     const files = dir.filter(el => el.match(/.*\.(txt)/gi));
@@ -249,22 +262,26 @@ function readDirectory() {
   });
 }
 
+// удаление выбранного файла из директории
 function deleteFile(event, args) {
   const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
+  // если файл существует
   if (existsSync(filePath)) {
     fs.unlinkSync(filePath);
   }
   readDirectory();
 }
+// открытие ранее сохраненного файла на редактирование
 function editFile(event, args) {
   const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
   const nameWithoutExtension = args.split('.');
 
+  // если файл существует
   if (existsSync(filePath)) {
     global.savingName.name = `${path.join(__dirname, '/tmp/')}${
       nameWithoutExtension[0]
     }`;
-
+    // считать файл из папки
     fs.readFile(filePath, 'utf-8', (err, data) => {
       toolsWindow.webContents.send('new test available', JSON.parse(data));
     });
@@ -272,21 +289,26 @@ function editFile(event, args) {
   readDirectory();
   toolsWindow.focus();
 }
-function convertFile(event, args, show = true) {
+
+// конвертация открытого в данный момент теста
+// тесту не обязательно быть сохраненным, строки теста приходят в функцию в args
+function convertFile(event, args) {
   const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
   if (existsSync(filePath)) {
     fs.readFile(filePath, 'utf-8', (err, data) => {
       convertTest(null, JSON.parse(data));
     });
   }
+  // отправка в окно файлов текущие названия файлов в папке
   readDirectory();
-  if (show) {
-    dialog.showMessageBox({
-      message: `Test ${args} was converted`,
-      buttons: ['Ok']
-    });
-  }
+  // окошко подтверждения сохранения файла
+  dialog.showMessageBox({
+    message: `Test ${args} was converted`,
+    buttons: ['Ok']
+  });
 }
+// конвертация файла без использования глобальной переменной текущего открытого файла
+// нужна чтобы конвертировать любой выбранный файл, а не только тот, который открыт
 function convertFileWOSavedName(args) {
   const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
   if (existsSync(filePath)) {
@@ -295,26 +317,27 @@ function convertFileWOSavedName(args) {
     });
   }
 }
+// функция вызывается из окна с файлами тестов и удаляет все файлы ПОКАЗАННЫЕ В ЭТОМ ОКНЕ
 function deleteAllFiles(event, args) {
+  // окошко подтверждения удаления всех тестов
   dialog.showMessageBox(
     {
       message: 'Do you want to delete all test files?',
       buttons: ['Ok', 'Cancel']
     },
     button => {
+      // если нажата "Ок"
       if (button === 0) {
         const filePath = path.join(__dirname, '/tmp');
-        // fs.readdir(filePath, (err, dir) => {
-        //   const files = dir.filter(el => el.match(/.*\.(txt)/gi));
         const quantity = args.length;
-
+        // удалить все
         for (let i = 0; i < quantity; i += 1) {
           fs.unlinkSync(`${filePath}/${args[i]}`);
         }
-        // });
+
         fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
           const files = dir.filter(el => el.match(/.*\.(txt)/gi));
-
+          // отправить обратно в окно файлы, оставшиеся в папке
           showAllWindow.webContents.send('all files from directory', files);
         });
       }
@@ -322,6 +345,7 @@ function deleteAllFiles(event, args) {
   );
 }
 
+// функция вызывается из окна с файлами тестов и конвертирует все файлы в папке
 function convertAllFiles() {
   fs.readdir(path.join(__dirname, '/tmp'), (err, dir) => {
     const files = dir.filter(el => el.match(/.*\.(txt)/gi));
@@ -337,6 +361,9 @@ function convertAllFiles() {
 }
 
 app.on('window-all-closed', () => {
+  mainWindow = null;
+  toolsWindow = null;
+  showAllWindow = null;
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -350,19 +377,16 @@ app.on('ready', async () => {
     await installExtensions();
   }
 
+  // создаются экземпляры окон с заданными размерами
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
-    height: 728,
-    webPreferences: {
-      allowRunningInsecureContent: true,
-      webSecurity: false
-    }
+    height: 728
   });
 
   toolsWindow = new BrowserWindow({
     show: false,
-    width: 700,
+    width: 850,
     height: 700
   });
 
@@ -373,7 +397,8 @@ app.on('ready', async () => {
   });
 
   toolsWindow.loadURL(`file://${__dirname}/tools.html`);
-
+  // после того как загрузится окно с инструментами
+  // показать его и меню приложения
   toolsWindow.webContents.on('did-finish-load', () => {
     if (!toolsWindow) {
       throw new Error('"toolsWindow" is not defined');
@@ -386,6 +411,8 @@ app.on('ready', async () => {
     Menu.setApplicationMenu(menu);
   });
 
+  // после того как страница со всеми файлами загрузится
+  // показать ее и заполнить таблицу
   showAllWindow.webContents.on('did-finish-load', () => {
     if (!showAllWindow) {
       throw new Error('"showAllWindow" is not defined');
@@ -395,17 +422,8 @@ app.on('ready', async () => {
     readDirectory();
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  toolsWindow.on('closed', () => {
-    toolsWindow = null;
-  });
-
-  showAllWindow.on('closed', () => {
-    showAllWindow = null;
-  });
+  // после того как тест.страница загрузится
+  // показать ее и загрузить в нее скрипт, перехватывающий события
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
     fs.readFile(
@@ -430,33 +448,50 @@ app.on('ready', async () => {
     );
   });
 
+  // реакция главного процесса на событыя
+  // клик по тестируемой странице
   ipcMain.on('new-mouse-click-event', clickFunction);
+  // даблклик по тестируемой странице
   ipcMain.on('new-mouse-doubleclick-event', doubleclickFunction);
-
+  // нажатие клавиши на тест. странице
   ipcMain.on('keydown', keydownFunction);
+  // отжатие клавиши
   ipcMain.on('keyup', keyupFunction);
-
+  // загрузка url тест. страницы
   ipcMain.on('new-url-event', loadTestingPage);
+  // сохранить открытый тест
   ipcMain.on('save-test', saveTest);
+  // тест. стр. скролится
   ipcMain.on('new-scroll', clickFunction);
+  // тест. стр. ресайзится
   ipcMain.on('new-resize', clickFunction);
+  // сохраняется сконвертированный открытый тест
   ipcMain.on('save-converted-test', convertTest);
+  // удалить все тестовые файлы из папки
   ipcMain.on('delete all files', deleteAllFiles);
+  // сконвертировать все тесты в папке
   ipcMain.on('convert all files', convertAllFiles);
+  // удалить выбранный файл
   ipcMain.on('delete file', deleteFile);
+  // редактировать выбранный файл
   ipcMain.on('edit file', editFile);
+  // конвертировать выбранный файл
   ipcMain.on('convert file', convertFile);
+  // загрузка тест. страницы с новым url после перехода по ссылке
   ipcMain.on('path to go', (event, args) => {
     if (navigationEnabled) {
       mainWindow.loadURL(args);
     }
   });
+  // включить переход по ссылкам в тест. странице
   ipcMain.on('navigate', () => {
     navigationEnabled = true;
   });
+  // выключить переход по ссылкам в тест. странице
   ipcMain.on('do not navigate', () => {
     navigationEnabled = false;
   });
+  // тест. страницу необходимо обновить
   ipcMain.on('need-to-reload', () => {
     mainWindow.reload();
   });
