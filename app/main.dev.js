@@ -218,7 +218,7 @@ function saveTest(event, args) {
   saveStream.close();
   readDirectory();
   dialog.showMessageBox({
-    message: `Test was saved to ${global.savingName.name}`,
+    message: `Test was saved to ${global.savingName.name}.txt`,
     buttons: ['Ok']
   });
 }
@@ -228,14 +228,42 @@ function saveConvertedTest(args) {
   const fileNames = global.savingName.name.split('/');
   const last = fileNames.pop();
   const convertStream = fs.createWriteStream(
-    `${fileNames.join('/')}/converted/${last}-converted.txt`
+    path.join(__dirname, `../../autotest-runner/__tests__/${last}-converted.js`)
   );
   const savingArr = [...args];
   const arrLength = savingArr.length;
+  convertStream.write(`var Application = require('spectron').Application;
+  var electronPath = require('electron');
+  const path = require('path');
+  const fs = require('fs');
+  jest.setTimeout(40000);
+  const createApp = async () => {
 
+  var app = new Application({
+      path: electronPath,
+      args: [
+          path.join(__dirname, '..')
+      ],
+  });
+      
+  await app.start();
+  return app;
+}
+test('${last}', async () => {
+const app = await createApp();
+`);
   for (let i = 0; i < arrLength; i += 1) {
     convertStream.write(savingArr[i]);
   }
+  convertStream.write(`await app.stop();
+});`);
+  dialog.showMessageBox({
+    message: `Test was converted to ${path.join(
+      __dirname,
+      `../../autotest-runner/__tests__/${last}-converted.js`
+    )}`,
+    buttons: ['Ok']
+  });
 }
 // сохранить тест не используя глобальную переменную имени файла
 function saveConvertedTestWOsavedName(args, name) {
@@ -246,7 +274,7 @@ function saveConvertedTestWOsavedName(args, name) {
     // `${fileNames.join('/')}../../../autotest-runner/__tests__/${testName[0]}-converted.txt`
     path.join(
       __dirname,
-      `../../autotest-runner/__tests__/${testName[0]}-converted.txt`
+      `../../autotest-runner/__tests__/${testName[0]}-converted.js`
     )
   );
   const savingArr = [...args];
@@ -277,6 +305,13 @@ test('${testName[0]}', async () => {
   }
   convertStream.write(`await app.stop();
 });`);
+  dialog.showMessageBox({
+    message: `Test was converted to ${path.join(
+      __dirname,
+      `../../autotest-runner/__tests__/${testName[0]}-converted.js`
+    )}`,
+    buttons: ['Ok']
+  });
 }
 // тестируемая страница загружается в главное окно
 function loadTestingPage(event, args) {
@@ -514,7 +549,6 @@ app.on('ready', async () => {
   ipcMain.on('path to go', (event, args) => {
     if (navigationEnabled) {
       currentURL = args;
-      console.log(args);
       mainWindow.loadURL(args);
     }
   });

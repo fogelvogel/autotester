@@ -114,9 +114,9 @@ class FindTestsPage extends React.Component {
           { className: 'w3-pink' },
           React.createElement('td', null, '\u2116'),
           React.createElement('td', null, 'file name'),
-          React.createElement('td', null, 'edit'),
-          React.createElement('td', null, 'convert'),
-          React.createElement('td', null, 'delete')
+          React.createElement('td', null),
+          React.createElement('td', null),
+          React.createElement('td', null)
         ),
         filenames.map((v, index) =>
           React.createElement(
