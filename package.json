@@ -1,7 +1,7 @@
 {
   "name": "electron-react-autotester",
   "productName": "electron-react-autotester",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "Electron application based on React, React Router, Webpack, React Hot Loader for testing electron apps",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",

@@ -70,6 +70,9 @@ function loadTest(event, args) {
 
 function addString(event, args) {
   state = store.getState();
+  if (args.actionName === 'url') {
+    store.dispatch(addTestString(args));
+  }
   if (state.testBody.length > 0)
     prevString = state.testBody[state.testBody.length - 1];
 

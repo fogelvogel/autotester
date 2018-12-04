@@ -32,6 +32,8 @@ const keysArr = ['Meta', 'Control', 'Alt', 'Shift'];
 // должна ли быть включена навигация на тестируемой странице (также влияет на запись некоторых действий)
 let navigationEnabled = true;
 
+let currentURL = 'https://www.yandex.ru';
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -107,6 +109,11 @@ function replaceNBSPs(str) {
 // функция переводит одну строку теста в виде объекта в строку, пригодную для запуска в spectron и jest
 function convertOneString(testString) {
   switch (testString.actionName) {
+    case 'url': {
+      return ` await app.client.url('${testString.attributes[0]}');
+      await app.client.waitUntilWindowLoaded();
+      `;
+    }
     case 'wait': {
       if (testString.attributes.length > 1) {
         return `await app.client.waitForExist('${testString.paths[0]}', ${
@@ -236,14 +243,40 @@ function saveConvertedTestWOsavedName(args, name) {
   fileNames.pop();
   const testName = name.split('.');
   const convertStream = fs.createWriteStream(
-    `${fileNames.join('/')}/converted/${testName[0]}-converted.txt`
+    // `${fileNames.join('/')}../../../autotest-runner/__tests__/${testName[0]}-converted.txt`
+    path.join(
+      __dirname,
+      `../../autotest-runner/__tests__/${testName[0]}-converted.txt`
+    )
   );
   const savingArr = [...args];
   const arrLength = savingArr.length;
 
+  convertStream.write(`var Application = require('spectron').Application;
+    var electronPath = require('electron');
+    const path = require('path');
+    const fs = require('fs');
+    jest.setTimeout(40000);
+    const createApp = async () => {
+
+    var app = new Application({
+        path: electronPath,
+        args: [
+            path.join(__dirname, '..')
+        ],
+    });
+        
+    await app.start();
+    return app;
+}
+test('${testName[0]}', async () => {
+  const app = await createApp();
+  `);
   for (let i = 0; i < arrLength; i += 1) {
     convertStream.write(savingArr[i]);
   }
+  convertStream.write(`await app.stop();
+});`);
 }
 // тестируемая страница загружается в главное окно
 function loadTestingPage(event, args) {
@@ -251,6 +284,7 @@ function loadTestingPage(event, args) {
     mainWindow.loadURL(`https://yandex.ru`);
   } else {
     mainWindow.loadURL(args);
+    currentURL = args;
   }
 }
 // функция стчитывает тестовые файлы и отправляет их в окно файлов
@@ -419,6 +453,11 @@ app.on('ready', async () => {
   // показать ее и загрузить в нее скрипт, перехватывающий события
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
+    toolsWindow.webContents.send('new test string available', {
+      actionName: 'url',
+      attributes: [currentURL],
+      paths: []
+    });
     fs.readFile(
       path.join(__dirname, 'script.js'),
       'utf8',
@@ -474,6 +513,8 @@ app.on('ready', async () => {
   // загрузка тест. страницы с новым url после перехода по ссылке
   ipcMain.on('path to go', (event, args) => {
     if (navigationEnabled) {
+      currentURL = args;
+      console.log(args);
       mainWindow.loadURL(args);
     }
   });
