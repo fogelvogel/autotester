@@ -173,7 +173,7 @@ export default class ToolsBar extends Component<Props> {
             <tr>
               <td>{index + 1}</td>
               <td>{`${v.actionName}`}</td>
-              <td>{`${v.attributes}`}</td>
+              <td className="to-scroll2">{`${v.attributes}`}</td>
               <td className="to-scroll">{`${v.paths}`}</td>
               <td>
                 <button

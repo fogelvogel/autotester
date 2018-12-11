@@ -2,3 +2,7 @@
   max-width: 420px;
   overflow: scroll;
 }
+.to-scroll2 {
+  max-width: 300px;
+  overflow: scroll;
+}

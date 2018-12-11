@@ -32,7 +32,10 @@ const keysArr = ['Meta', 'Control', 'Alt', 'Shift'];
 // должна ли быть включена навигация на тестируемой странице (также влияет на запись некоторых действий)
 let navigationEnabled = true;
 
-let currentURL = 'https://www.yandex.ru';
+let currentURL = `file://${path.join(
+  __dirname,
+  `../../autotest-runner/App/demo.html`
+)}`;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -316,7 +319,9 @@ test('${testName[0]}', async () => {
 // тестируемая страница загружается в главное окно
 function loadTestingPage(event, args) {
   if (args === null || args === '') {
-    mainWindow.loadURL(`https://yandex.ru`);
+    mainWindow.loadURL(
+      `file://${path.join(__dirname, `../../autotest-runner/App/demo.html`)}`
+    );
   } else {
     mainWindow.loadURL(args);
     currentURL = args;
