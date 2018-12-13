@@ -473,6 +473,7 @@ app.on('ready', async () => {
 
     toolsWindow.show();
     toolsWindow.focus();
+
     const menuBuilder = new MenuBuilder(mainWindow, toolsWindow, showAllWindow);
     const menu = menuBuilder.buildMenu();
     Menu.setApplicationMenu(menu);
@@ -493,11 +494,17 @@ app.on('ready', async () => {
   // показать ее и загрузить в нее скрипт, перехватывающий события
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show();
+
+    // const content = fs.readFileSync(path.join(__dirname, 'TestingPropertiesConfig.json'));
+    // const confObject = JSON.parse(content);
+
+    // ipcMain.send('config object', confObject);
     toolsWindow.webContents.send('new test string available', {
       actionName: 'url',
       attributes: [currentURL],
       paths: []
     });
+
     fs.readFile(
       path.join(__dirname, 'script.js'),
       'utf8',

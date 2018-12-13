@@ -1,4 +1,13 @@
 const ipc = require('electron').ipcRenderer;
+// const fs = require('fs');
+// const path = require('path');
+
+let confObject = null;
+
+ipc.on('config object', (event, args) => {
+  console.log(args);
+  confObject = args;
+});
 
 function getPathTo(element) {
   if (element.tagName === 'HTML') {
@@ -26,20 +35,13 @@ function getPathTo(element) {
   }
 }
 
-window.onclick = e => {
-  const path = e.target.href;
-  if (path !== undefined) {
-    console.log(path);
-    e.stopPropagation();
-    e.preventDefault();
-    ipc.send('path to go', path);
-  }
-  const tmp = getPathTo(e.target);
-
+function assembleMessage(tmp, e, arg1 = null, arg2 = null) {
   const testingParams = [
     e.target.innerText,
     `${e.target.offsetHeight} ${e.target.offsetWidth}`,
-    e.target.className
+    e.target.className,
+    arg1,
+    arg2
   ];
   ipc.send(
     'new-mouse-click-event',
@@ -53,6 +55,31 @@ window.onclick = e => {
       }
     )
   );
+}
+
+window.onclick = e => {
+  const path = e.target.href;
+  if (path !== undefined) {
+    console.log(path);
+    e.stopPropagation();
+    e.preventDefault();
+    ipc.send('path to go', path);
+  }
+  const tmp = getPathTo(e.target);
+  switch (e.target.tagName) {
+    case confObject.INPUT.name: {
+      for (let i = 0; i < confObject.INPUT.type.length; i += 1) {
+        if (e.target.type === confObject.INPUT.type[i]) {
+          console.log('this is checkbox', e.target.type);
+        }
+      }
+
+      break;
+    }
+    default:
+      break;
+  }
+  assembleMessage(tmp, e);
 };
 window.ondblclick = e => {
   const tmp = getPathTo(e.target);

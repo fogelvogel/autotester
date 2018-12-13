@@ -20,7 +20,6 @@ ipc.on('new test string available', addString);
 ipc.on('new test available', loadTest);
 ipc.on('need to save as', helpingFunction);
 ipc.on('need to save', helpingFunction);
-
 type Props = {
   waitForElement: () => void,
   fixData: () => void,
@@ -313,7 +312,7 @@ function DrawAdditionalFields(props) {
           <label htmlFor="isExisting">
             <input
               type="checkbox"
-              name="isExisting"
+              name="is existing"
               ref={setExists}
               className="w3-check"
             />

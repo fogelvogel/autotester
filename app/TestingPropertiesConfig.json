@@ -1,0 +1,11 @@
+{
+  "INPUT": {
+    "name": "INPUT",
+    "type": ["checkbox", "radiobutton"],
+    "property": "checked"
+  },
+  "SELECT": {
+    "name": "SELECT",
+    "property": ["options", "selectedIndex"]
+  }
+}
