@@ -2,12 +2,12 @@ const ipc = require('electron').ipcRenderer;
 // const fs = require('fs');
 // const path = require('path');
 
-let confObject = null;
+// let confObject = null;
 
-ipc.on('config object', (event, args) => {
-  console.log(args);
-  confObject = args;
-});
+// ipc.on('config object', (event, args) => {
+//   console.log(args);
+//   confObject = args;
+// });
 
 function getPathTo(element) {
   if (element.tagName === 'HTML') {
@@ -65,21 +65,51 @@ window.onclick = e => {
     e.preventDefault();
     ipc.send('path to go', path);
   }
+  let arg1 = null;
+  let arg2 = null;
+
   const tmp = getPathTo(e.target);
   switch (e.target.tagName) {
-    case confObject.INPUT.name: {
-      for (let i = 0; i < confObject.INPUT.type.length; i += 1) {
-        if (e.target.type === confObject.INPUT.type[i]) {
-          console.log('this is checkbox', e.target.type);
-        }
+    case 'INPUT': {
+      if (e.target.type === 'checkbox') {
+        arg1 = e.target.checked;
       }
+      if (e.target.type === 'radio') {
+        arg1 = e.target.checked;
+      }
+      if (e.target.type === 'text') {
+        arg1 = e.target.value;
+      }
+
+      break;
+    }
+    case 'SELECT': {
+      arg1 = [];
+      for (let i = 0; i < e.target.options.length; i += 1) {
+        arg1.push(e.target.options[i].innerText);
+      }
+
+      arg2 = e.target.options[e.target.selectedIndex].text;
 
       break;
     }
     default:
       break;
   }
-  assembleMessage(tmp, e);
+  // switch (e.target.tagName) {
+  //   case confObject.INPUT.name: {
+  //     for (let i = 0; i < confObject.INPUT.type.length; i += 1) {
+  //       if (e.target.type === confObject.INPUT.type[i]) {
+  //         console.log('this is checkbox', e.target.type);
+  //       }
+  //     }
+
+  //     break;
+  //   }
+  //   default:
+  //     break;
+  // }
+  assembleMessage(tmp, e, arg1, arg2);
 };
 window.ondblclick = e => {
   const tmp = getPathTo(e.target);

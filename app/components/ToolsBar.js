@@ -116,6 +116,22 @@ function addString(event, args) {
         counter += 1;
       }
     }
+    if (args.testParams[3] !== null) {
+      if (typeof args.testParams[3] === 'boolean') {
+        arrToTest.push(`checked=${args.testParams[3]}`);
+        counter += 1;
+      } else {
+        if (Array.isArray(args.testParams[3])) {
+          for (let i = 0; i < args.testParams[3].length; i += 1) {
+            arrToTest.push(`option=${args.testParams[3][i]}`);
+            counter += 1;
+          }
+          arrToTest.push(`selectedOption=${args.testParams[4]}`);
+        } else {
+          arrToTest.push(`value=${args.testParams[3]}`);
+        }
+      }
+    }
     const newArgs = {
       actionName: 'test',
       attributes: arrToTest,
