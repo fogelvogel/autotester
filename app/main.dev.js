@@ -100,9 +100,10 @@ function makeTestingString(attribute, paths) {
       }');\n`;
     }
     case 'checked': {
-      return `expect(await app.client.getAttribute('${paths}', 'checked')).toEqual('${
-        attrib[1]
-      }');\n`;
+      if (attrib[1] === true) {
+        return `expect(await app.client.getAttribute('${paths}', 'checked')).not.toBeNull();\n`;
+      }
+      return `expect(await app.client.getAttribute('${paths}', 'checked')).toBeNull();\n`;
     }
     case 'value': {
       return `expect(await app.client.getAttribute('${paths}', 'value')).toEqual('${
@@ -116,8 +117,10 @@ function makeTestingString(attribute, paths) {
     }
     case 'selectedOption': {
       return `select = await app.client.element('${paths}').value;
-      select.selectByAttribute('value', ${attrib[1]});
-      expect(select.getValue()).toEqual(${attrib[1]});\n`;
+      selectedIndex = (await app.client.elementIdAttribute('${paths}', 'options')).selectedIndex;
+      expect((await app.client.elementIdAttribute('${paths}', 'options'))[selectedIndex]).toEqual(${
+        attrib[1]
+      });\n`;
     }
     default:
       break;
@@ -275,6 +278,7 @@ function saveConvertedTest(args) {
 test('${last}', async () => {
 const app = await createApp();
 let select = null;
+let selectedIndex = null;
 `);
   for (let i = 0; i < arrLength; i += 1) {
     convertStream.write(savingArr[i]);
@@ -324,6 +328,7 @@ function saveConvertedTestWOsavedName(args, name) {
 test('${testName[0]}', async () => {
   const app = await createApp();
   let select = null;
+  let selectedIndex = null;
   `);
   for (let i = 0; i < arrLength; i += 1) {
     convertStream.write(savingArr[i]);
