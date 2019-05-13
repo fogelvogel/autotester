@@ -24,6 +24,19 @@ let showAllWindow = null;
 // глобальная переменная хранит полное имя текущего открытого файла
 global.savingName = { name: path.join(__dirname, `/tmp/test1`) };
 
+global.lastTestedPages = [
+  'rtretrtawt',
+  'dhasjkdha',
+  'rtretrtawt',
+  'dhasjkdha',
+  'rtretrtawt',
+  'dhasjkdha',
+  'rtretrtawt',
+  'dhasjkdha',
+  'rtretrtawt',
+  'dhasjkdha'
+];
+
 // this keys are being toggled by webdriver function "keys"
 // эти клавиши функция вебдрайвера "keys" тогглит а не просто нажимает
 const keysArr = ['Meta', 'Control', 'Alt', 'Shift'];
@@ -500,6 +513,7 @@ app.on('ready', async () => {
 
     toolsWindow.show();
     toolsWindow.focus();
+    toolsWindow.toggleDevTools();
 
     const menuBuilder = new MenuBuilder(mainWindow, toolsWindow, showAllWindow);
     const menu = menuBuilder.buildMenu();

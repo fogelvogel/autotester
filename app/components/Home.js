@@ -8,6 +8,10 @@ import routes from '../constants/routes';
 
 const ipc = require('electron').ipcRenderer;
 
+const { remote } = require('electron');
+
+const lastTestedPages = remote.getGlobal('lastTestedPages');
+
 type Props = {};
 
 export default class Home extends Component<Props> {
@@ -43,6 +47,33 @@ export default class Home extends Component<Props> {
         >
           <Link to={routes.TEST}>GO!</Link>
         </button>
+        <div className="middle-text"> or choose one of the saved pages</div>
+
+        <table className="w3-table w3-bordered w3-margin-top w3-margin-bottom">
+          <tr className="w3-pink">
+            <td>№</td>
+            <td>URL</td>
+            <td>delete</td>
+          </tr>
+
+          {lastTestedPages.map((v, index) => (
+            <tr>
+              <td>{index + 1}</td>
+              <td className="to-scroll">{v}</td>
+              <td>
+                <button
+                  onClick={() => {
+                    console.log('deleted', v);
+                  }}
+                  className="w3-btn w3-red"
+                  type="button"
+                >
+                  X
+                </button>
+              </td>
+            </tr>
+          ))}
+        </table>
       </div>
     );
   }
