@@ -1,0 +1,61 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-between;
+  width: 65%;
+}
+.wrapper-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  max-height: 80%;
+}
+.paste-url-text {
+  text-align: center;
+  font-size: 30px;
+  padding-top: 60px;
+}
+.go-button {
+  width: 96px;
+  height: 45px;
+  background-color: #f181df;
+  outline: inherit;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  color: white;
+}
+.input-url {
+  width: 538px;
+  height: 45px;
+}
+.input-group {
+  padding-top: 50px;
+}
+.middle-text {
+  padding-top: 25px;
+  padding-bottom: 25px;
+  text-align: center;
+}
+.button-icon {
+  background-image: url(../app/icons/icons8-trash-50.png);
+  background-color: #ff4646;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 23px 20px;
+  outline: inherit;
+  border: none;
+  border-radius: 3px;
+  height: 30px;
+  width: 31px;
+  cursor: pointer;
+}
+input::placeholder {
+  text-align: center;
+  color: #a1a1a1;
+}
+.first-tr {
+  background-color: #f181df;
+  color: white;
+}

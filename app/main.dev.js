@@ -28,11 +28,6 @@ global.lastTestedPages = [
   'rtretrtawt',
   'dhasjkdha',
   'rtretrtawt',
-  'dhasjkdha',
-  'rtretrtawt',
-  'dhasjkdha',
-  'rtretrtawt',
-  'dhasjkdha',
   'rtretrtawt',
   'dhasjkdha'
 ];
@@ -493,14 +488,14 @@ app.on('ready', async () => {
 
   toolsWindow = new BrowserWindow({
     show: false,
-    width: 850,
-    height: 700
+    width: 1024,
+    height: 768
   });
 
   showAllWindow = new BrowserWindow({
     show: false,
-    width: 500,
-    height: 700
+    width: 469,
+    height: 665
   });
 
   toolsWindow.loadURL(`file://${__dirname}/tools.html`);

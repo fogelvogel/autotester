@@ -6,3 +6,11 @@
   max-width: 300px;
   overflow: scroll;
 }
+.to-scroll3 {
+  max-height: 150px;
+  overflow: scroll;
+}
+.to-scroll4 {
+  width: 560px;
+  overflow: scroll;
+}
