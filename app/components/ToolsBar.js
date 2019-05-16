@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import styles from './Counter.css';
 // import { saveTestToFile } from '../helpers';
 // import * as confStore from '../store/configureStore';
 import { addTestString, deletePrevious } from '../actions/testBodyActions';
@@ -173,92 +172,98 @@ export default class ToolsBar extends Component<Props> {
 
     return (
       <div>
-        <div>
-          <h2 id="testField">Your test is here:</h2>
-        </div>
-        <table className="w3-table w3-bordered w3-margin-top w3-margin-bottom">
-          <tr className="w3-pink">
-            <td>№</td>
-            <td>action</td>
-            <td>atribute</td>
-            <td>paths</td>
-            <td>delete</td>
-          </tr>
-          {testBody.map((v, index) => (
-            <tr>
-              <td>{index + 1}</td>
-              <td>{`${v.actionName}`}</td>
-              <td className="to-scroll2">{`${v.attributes}`}</td>
-              <td className="to-scroll">{`${v.paths}`}</td>
-              <td>
+        <div className="wrapper-center-tools">
+          <div className="wrapper">
+            <div>
+              <div className="test-name">
+                <h4 id="testField">new_test</h4>
+              </div>
+              <div className="delete-test" />
+            </div>
+            <table className="w3-table w3-bordered w3-margin-top w3-margin-bottom">
+              <tr className="first-tr">
+                <td>№</td>
+                <td>action</td>
+                <td>atribute</td>
+                <td>paths</td>
+                <td>delete</td>
+              </tr>
+              {testBody.map((v, index) => (
+                <tr>
+                  <td>{index + 1}</td>
+                  <td>{`${v.actionName}`}</td>
+                  <td className="to-scroll2">{`${v.attributes}`}</td>
+                  <td className="to-scroll">{`${v.paths}`}</td>
+                  <td>
+                    <button
+                      onClick={() => {
+                        deleteOneString(index + 1);
+                      }}
+                      className="button-icon"
+                      type="button"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </table>
+
+            <div>
+              <div className="buttons-row">
                 <button
-                  onClick={() => {
-                    deleteOneString(index + 1);
-                  }}
-                  className="w3-btn w3-red"
+                  className="mode-button"
+                  onClick={clearTest}
                   type="button"
                 >
-                  X
+                  clear test
                 </button>
-              </td>
-            </tr>
-          ))}
-        </table>
+                <button
+                  className="mode-button"
+                  onClick={helpingFunction}
+                  type="button"
+                >
+                  save test
+                </button>
 
-        <div>
-          <div className={styles.btnGroup}>
-            <button
-              className="w3-btn w3-pink"
-              onClick={waitForElement}
-              type="button"
-            >
-              wait for smth
-            </button>
-            <button className="w3-btn w3-pink" onClick={fixData} type="button">
-              write action
-            </button>
-            <button
-              className="w3-btn w3-pink"
-              onClick={doTestAction}
-              type="button"
-            >
-              test element
-            </button>
-          </div>
-          <div>
-            <button
-              className="w3-btn w3-red w3-margin-top"
-              onClick={clearTest}
-              type="button"
-            >
-              clear test
-            </button>
-            <button
-              className="w3-btn w3-sand w3-margin-top"
-              onClick={helpingFunction}
-              type="button"
-            >
-              save test
-            </button>
+                <button
+                  className="mode-button"
+                  data-tclass="btn"
+                  type="button"
+                  onClick={helpConvertTest}
+                >
+                  convert test
+                </button>
+              </div>
+              <div className="buttons-row">
+                <button
+                  className="mode-button"
+                  onClick={waitForElement}
+                  type="button"
+                >
+                  wait for smth
+                </button>
+                <button className="mode-button" onClick={fixData} type="button">
+                  write action
+                </button>
+                <button
+                  className="mode-button"
+                  onClick={doTestAction}
+                  type="button"
+                >
+                  test element
+                </button>
+              </div>
 
-            <button
-              className="w3-btn w3-sand w3-margin-top"
-              data-tclass="btn"
-              type="button"
-              onClick={helpConvertTest}
-            >
-              convert test
-            </button>
-          </div>
-          <button
-            className="w3-btn w3-pink w3-margin-top"
+              {/* <button
+            className="mode-button"
             type="button"
             onClick={() => ipc.send('show all tests in window')}
           >
             show all tests
-          </button>
+          </button> */}
+            </div>
+            <DrawAdditionalFields mode={mode} />
+          </div>
         </div>
-        <DrawAdditionalFields mode={mode} />
       </div>
     );
   }

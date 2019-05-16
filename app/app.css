@@ -11,6 +11,26 @@
   justify-content: space-around;
   max-height: 80%;
 }
+.wrapper-center-tools {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  max-height: 95%;
+}
+.delete-test {
+  background-image: url(../app/icons/icons8-trash2-50.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 23px 20px;
+  width: 31px;
+  height: 30px;
+  display: inline-block;
+  vertical-align: middle;
+  margin: -3px 0 0 10px;
+}
+.test-name {
+  display: inline-block;
+}
 .paste-url-text {
   text-align: center;
   font-size: 30px;
@@ -25,6 +45,21 @@
   border-radius: 2px;
   cursor: pointer;
   color: white;
+}
+.mode-button {
+  width: 125px;
+  height: 40px;
+  background-color: #c4c4c4;
+  outline: inherit;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  color: black;
+  margin-right: 10px;
+}
+
+.buttons-row {
+  margin-bottom: 10px;
 }
 .input-url {
   width: 538px;
