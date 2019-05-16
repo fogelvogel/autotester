@@ -523,6 +523,7 @@ app.on('ready', async () => {
     }
     showAllWindow.show();
     showAllWindow.focus();
+    showAllWindow.toggleDevTools();
     readDirectory();
   });
 
