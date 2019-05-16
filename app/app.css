@@ -57,13 +57,40 @@
   color: black;
   margin-right: 10px;
 }
-
+.mode-button-findtests {
+  width: 70px;
+  height: 30px;
+  background-color: #c4c4c4;
+  outline: inherit;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  color: black;
+  margin-right: 10px;
+}
 .buttons-row {
   margin-bottom: 10px;
+}
+.buttons-row-findtests {
+  margin-top: 10px;
 }
 .input-url {
   width: 538px;
   height: 45px;
+}
+.input-url-findtests {
+  width: 371px;
+  height: 45px;
+}
+.create-button {
+  width: 66px;
+  height: 45px;
+  background-color: #f181df;
+  outline: inherit;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  color: white;
 }
 .input-group {
   padding-top: 50px;

@@ -92,7 +92,7 @@ class FindTestsPage extends React.Component {
       null,
       React.createElement('input', {
         type: 'text',
-        className: 'input-url',
+        className: 'input-url-findtests',
         placeholder: 'Search by file name',
         ref: this.setInput
       }),
@@ -101,10 +101,10 @@ class FindTestsPage extends React.Component {
         {
           'data-tclass': 'btn',
           type: 'button',
-          className: 'go-button',
+          className: 'create-button',
           onClick: this.filterRes
         },
-        'filter'
+        'create'
       ),
       React.createElement(
         'table',
@@ -132,7 +132,7 @@ class FindTestsPage extends React.Component {
                 {
                   'data-tclass': 'btn',
                   type: 'button',
-                  className: 'mode-button',
+                  className: 'mode-button-findtests',
                   onClick: () => editThisFile(v)
                 },
                 'edit'
@@ -146,7 +146,7 @@ class FindTestsPage extends React.Component {
                 {
                   'data-tclass': 'btn',
                   type: 'button',
-                  className: 'mode-button',
+                  className: 'mode-button-findtests',
                   onClick: () => convertThisFile(v)
                 },
                 'convert'
@@ -155,39 +155,41 @@ class FindTestsPage extends React.Component {
             React.createElement(
               'td',
               null,
-              React.createElement(
-                'button',
-                {
-                  'data-tclass': 'btn',
-                  type: 'button',
-                  className: 'mode-button',
-                  onClick: () => deleteThisFile(v)
-                },
-                'delete'
-              )
+              React.createElement('button', {
+                'data-tclass': 'btn',
+                type: 'button',
+                className: 'button-icon',
+                onClick: () => deleteThisFile(v)
+              })
             )
           )
         )
       ),
       React.createElement(
-        'button',
+        'div',
         {
-          'data-tclass': 'btn',
-          type: 'button',
-          className: 'mode-button',
-          onClick: () => this.convertAll()
+          className: 'buttons-row-findtests'
         },
-        'convert all'
-      ),
-      React.createElement(
-        'button',
-        {
-          'data-tclass': 'btn',
-          type: 'button',
-          className: 'mode-button',
-          onClick: () => this.deleteAll()
-        },
-        'delete all'
+        React.createElement(
+          'button',
+          {
+            'data-tclass': 'btn',
+            type: 'button',
+            className: 'mode-button',
+            onClick: () => this.convertAll()
+          },
+          'convert all'
+        ),
+        React.createElement(
+          'button',
+          {
+            'data-tclass': 'btn',
+            type: 'button',
+            className: 'mode-button',
+            onClick: () => this.deleteAll()
+          },
+          'delete all'
+        )
       )
     );
   }
