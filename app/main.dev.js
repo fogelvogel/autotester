@@ -24,13 +24,13 @@ let showAllWindow = null;
 // глобальная переменная хранит полное имя текущего открытого файла
 global.savingName = { name: path.join(__dirname, `/tmp/test1`) };
 
-global.lastTestedPages = [
-  'rtretrtawt',
-  'dhasjkdha',
-  'rtretrtawt',
-  'rtretrtawt',
-  'dhasjkdha'
-];
+// global.lastTestedPages = [
+//   'rtretrtawt',
+//   'dhasjkdha',
+//   'rtretrtawt',
+//   'rtretrtawt',
+//   'dhasjkdha'
+// ];
 
 // this keys are being toggled by webdriver function "keys"
 // эти клавиши функция вебдрайвера "keys" тогглит а не просто нажимает
@@ -371,6 +371,14 @@ function readDirectory() {
   });
 }
 
+function readSettings() {
+  const filePath = path.join(__dirname, '/settings.txt');
+
+  fs.readFile(filePath, 'utf-8', (err, data) => {
+    global.lastTestedPages = [...JSON.parse(data).visited];
+  });
+}
+
 // удаление выбранного файла из директории
 function deleteFile(event, args) {
   const filePath = `${path.join(__dirname, '/tmp/')}${args}`;
@@ -497,7 +505,7 @@ app.on('ready', async () => {
     width: 469,
     height: 665
   });
-
+  readSettings();
   toolsWindow.loadURL(`file://${__dirname}/tools.html`);
   // после того как загрузится окно с инструментами
   // показать его и меню приложения
