@@ -353,14 +353,23 @@ test('${testName[0]}', async () => {
 }
 // тестируемая страница загружается в главное окно
 function loadTestingPage(event, args) {
+  let newPath;
   if (args === null || args === '') {
-    mainWindow.loadURL(
-      `file://${path.join(__dirname, `../../autotest-runner/App/demo.html`)}`
-    );
+    newPath = `file://${path.join(
+      __dirname,
+      `../../autotest-runner/App/demo.html`
+    )}`;
+    mainWindow.loadURL(newPath);
   } else {
     mainWindow.loadURL(args);
     currentURL = args;
+    newPath = args;
   }
+  const newSavePaths = [...global.lastTestedPages];
+  newSavePaths.unshift(newPath);
+  newSavePaths.pop();
+  global.lastTestedPages = [...newSavePaths];
+  console.log(global.lastTestedPages);
 }
 // функция стчитывает тестовые файлы и отправляет их в окно файлов
 function readDirectory() {
@@ -376,6 +385,20 @@ function readSettings() {
 
   fs.readFile(filePath, 'utf-8', (err, data) => {
     global.lastTestedPages = [...JSON.parse(data).visited];
+  });
+}
+
+function writeSettings() {
+  const filePath = path.join(__dirname, '/settings.txt');
+  let newData;
+
+  fs.readFile(filePath, 'utf-8', (err, data) => {
+    newData = JSON.parse(data);
+    newData.visited = [...global.lastTestedPages];
+    console.log(newData);
+  });
+  fs.writeFile(filePath, JSON.stringify(newData), err => {
+    if (err) console.log(err);
   });
 }
 
@@ -471,6 +494,7 @@ function convertAllFiles() {
 }
 
 app.on('window-all-closed', () => {
+  writeSettings();
   mainWindow = null;
   toolsWindow = null;
   showAllWindow = null;
