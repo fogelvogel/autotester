@@ -1,3 +1,4 @@
+/* eslint-disable no-script-url */
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
@@ -17,6 +18,14 @@ type Props = {};
 export default class Home extends Component<Props> {
   props: Props;
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      inputValue: ''
+    };
+  }
+
   input = null;
 
   seInput = el => {
@@ -24,26 +33,35 @@ export default class Home extends Component<Props> {
   };
 
   saveTestingURl = () => {
+    const { inputValue } = this.state;
     // if (Helper.checkField(this.input.value)) {
-    ipc.send('new-url-event', this.input.value);
+    ipc.send('first-url-event', inputValue);
     // } else {
     //   console.log('value in field is invalid');
     // }
   };
 
   render() {
+    const { inputValue } = this.state;
+
+    const onTodoChange = value => {
+      this.setState({
+        inputValue: value
+      });
+    };
+
     return (
       <div className="wrapper-center">
         <div className="wrapper">
-          <div className="paste-url-text">
-            Paste your URL in the input form below
-          </div>
+          <div className="paste-url-text">Вставьте адрес в поле</div>
           <div className="input-group">
             <input
               className="input-url"
-              ref={this.seInput}
+              // ref={this.seInput}
               type="text"
               placeholder="Paste your link here"
+              value={inputValue}
+              onChange={e => onTodoChange(e.target.value)}
             />
             <button
               type="button"
@@ -53,7 +71,10 @@ export default class Home extends Component<Props> {
               <Link to={routes.TEST}>GO</Link>
             </button>
           </div>
-          <div className="middle-text"> or choose one of the saved pages</div>
+          <div className="middle-text">
+            {' '}
+            или выберите одну из предыдущих страниц
+          </div>
 
           <table className="w3-table w3-bordered w3-margin-top w3-margin-bottom to-scroll3">
             <tr className="first-tr">
@@ -65,7 +86,11 @@ export default class Home extends Component<Props> {
             {lastTestedPages.map((v, index) => (
               <tr>
                 <td>{index + 1}</td>
-                <td className="to-scroll4">{v}</td>
+                <td className="to-scroll4">
+                  <a href="javascript:void(0)" onClick={() => onTodoChange(v)}>
+                    {v}
+                  </a>
+                </td>
                 <td>
                   <button
                     onClick={() => {

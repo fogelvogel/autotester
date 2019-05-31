@@ -1,3 +1,1 @@
-{
-"visited":["a","sdad","dadad","weqwqq", ""]
-}
+{"visited":["https://yandex.ru/","https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Array/includes","https://www.youtube.com/watch?v=FCzE5-JctUs","https://www.youtube.com/watch?v=FCzE5-JctUs","file://C:\\Users\\fogelvogel\\autotester\\autotest-runner\\App\\demo.html"]}

@@ -104,7 +104,7 @@ class FindTestsPage extends React.Component {
           className: 'create-button',
           onClick: this.filterRes
         },
-        'create'
+        'Искать'
       ),
       React.createElement(
         'table',
@@ -135,7 +135,7 @@ class FindTestsPage extends React.Component {
                   className: 'mode-button-findtests',
                   onClick: () => editThisFile(v)
                 },
-                'edit'
+                'Ред.'
               )
             ),
             React.createElement(
@@ -149,7 +149,7 @@ class FindTestsPage extends React.Component {
                   className: 'mode-button-findtests',
                   onClick: () => convertThisFile(v)
                 },
-                'convert'
+                'Конв.'
               )
             ),
             React.createElement(
@@ -178,7 +178,7 @@ class FindTestsPage extends React.Component {
             className: 'mode-button',
             onClick: () => this.convertAll()
           },
-          'convert all'
+          'Конверт. все'
         ),
         React.createElement(
           'button',
@@ -188,7 +188,7 @@ class FindTestsPage extends React.Component {
             className: 'mode-button',
             onClick: () => this.deleteAll()
           },
-          'delete all'
+          'Удалить все'
         )
       )
     );

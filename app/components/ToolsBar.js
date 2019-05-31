@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
 // import { saveTestToFile } from '../helpers';
 // import * as confStore from '../store/configureStore';
+import { Link } from 'react-router-dom';
 import { addTestString, deletePrevious } from '../actions/testBodyActions';
 import * as initial from '../initialState';
 import { convertTest } from '../helpers';
 
-const ipc = require('electron').ipcRenderer;
+import routes from '../constants/routes';
+
+const electron = require('electron');
+
+const { ipcRenderer, remote } = electron;
 
 let prevString;
 
@@ -14,11 +19,11 @@ let exists = null;
 const toTest = [];
 const namesOfTestingAttributes = ['text', 'size', 'classes'];
 
-ipc.on('need to delete previous two', deletePreviousTwo);
-ipc.on('new test string available', addString);
-ipc.on('new test available', loadTest);
-ipc.on('need to save as', helpingFunction);
-ipc.on('need to save', helpingFunction);
+ipcRenderer.on('need to delete previous two', deletePreviousTwo);
+ipcRenderer.on('new test string available', addString);
+ipcRenderer.on('new test available', loadTest);
+ipcRenderer.on('need to save as', helpingFunction);
+ipcRenderer.on('need to save', helpingFunction);
 type Props = {
   waitForElement: () => void,
   fixData: () => void,
@@ -31,11 +36,24 @@ type Props = {
 // // const store = confStore.configureStore();
 const store = initial.getStore();
 
+let currentTestName = 'unnamed';
+
 let state = null;
 function helpingFunction() {
-  state = store.getState();
-  ipc.send('save-test', state.testBody);
-  // saveTestToFile(state);
+  const oldString = remote.getGlobal('savingName').name;
+
+  const endSymbol = oldString.slice(oldString.length - 1, oldString.length);
+  if (endSymbol === '#') {
+    ipcRenderer.send('saving-as-first');
+  } else {
+    state = store.getState();
+    ipcRenderer.send('save-test', state.testBody);
+    // saveTestToFile(state);
+    console.log(oldString);
+    const splittedFileName = oldString.split('\\');
+
+    currentTestName = splittedFileName[splittedFileName.length - 1];
+  }
 }
 
 function helpConvertTest() {
@@ -175,18 +193,23 @@ export default class ToolsBar extends Component<Props> {
         <div className="wrapper-center-tools">
           <div className="wrapper">
             <div>
-              <div className="test-name">
-                <h4 id="testField">new_test</h4>
+              <button type="button" className="go-button">
+                <Link to={routes.HOME}>Вернуться</Link>
+              </button>
+              <div>
+                <div className="test-name">
+                  <h4 id="testField">{currentTestName}</h4>
+                </div>
               </div>
               <div className="delete-test" />
             </div>
             <table className="w3-table w3-bordered w3-margin-top w3-margin-bottom">
               <tr className="first-tr">
                 <td>№</td>
-                <td>action</td>
-                <td>atribute</td>
-                <td>paths</td>
-                <td>delete</td>
+                <td>действие</td>
+                <td>аттрибуты</td>
+                <td>пути</td>
+                <td>удалить</td>
               </tr>
               {testBody.map((v, index) => (
                 <tr>
@@ -214,14 +237,14 @@ export default class ToolsBar extends Component<Props> {
                   onClick={clearTest}
                   type="button"
                 >
-                  clear test
+                  очистить
                 </button>
                 <button
                   className="mode-button"
                   onClick={helpingFunction}
                   type="button"
                 >
-                  save test
+                  сохранить
                 </button>
 
                 <button
@@ -230,7 +253,7 @@ export default class ToolsBar extends Component<Props> {
                   type="button"
                   onClick={helpConvertTest}
                 >
-                  convert test
+                  конверт.
                 </button>
               </div>
               <div className="buttons-row">
@@ -239,27 +262,19 @@ export default class ToolsBar extends Component<Props> {
                   onClick={waitForElement}
                   type="button"
                 >
-                  wait for smth
+                  дождаться
                 </button>
                 <button className="mode-button" onClick={fixData} type="button">
-                  write action
+                  записать
                 </button>
                 <button
                   className="mode-button"
                   onClick={doTestAction}
                   type="button"
                 >
-                  test element
+                  тестировать
                 </button>
               </div>
-
-              {/* <button
-            className="mode-button"
-            type="button"
-            onClick={() => ipc.send('show all tests in window')}
-          >
-            show all tests
-          </button> */}
             </div>
             <DrawAdditionalFields mode={mode} />
           </div>
@@ -314,7 +329,8 @@ function DrawAdditionalFields(props) {
       return (
         <div>
           <h3>
-            Type delay in milliseconds or pick element, that needs to be wated
+            Введите задержку в мс или выберите элемент, существование которого
+            необходимо подождать, мышью
           </h3>
           <input
             type="text"
@@ -327,7 +343,7 @@ function DrawAdditionalFields(props) {
             onClick={addDelayString}
             className="w3-btn w3-pink w3-half"
           >
-            Add delay
+            Добавить задержку
           </button>
           <h3>or</h3>
           <label htmlFor="isExisting">
@@ -337,7 +353,7 @@ function DrawAdditionalFields(props) {
               ref={setExists}
               className="w3-check"
             />
-            element exists
+            Элемент существует, ждем, пока он исчезнет
           </label>
           <input
             type="text"
@@ -347,8 +363,8 @@ function DrawAdditionalFields(props) {
           />
           <div>
             <p>
-              if you want to wait for some element to exist pick an element by
-              your cursor
+              Если вы хотите указать, что элемент обязательно должен
+              существовать во время исполнения теста, выберите его мышью
             </p>
           </div>
         </div>
@@ -357,15 +373,15 @@ function DrawAdditionalFields(props) {
     case 2: {
       return (
         <div>
-          <h3>Do something witn your page</h3>
-          <p>click anywhere, type something or resize testing page window</p>
+          <h3>Начните работу с тестируемой страницей</h3>
+          <p>Кликните, напечатайте что-нибудь или измените размер окна</p>
         </div>
       );
     }
     case 3: {
       return (
         <div>
-          <h3>Test some values</h3>
+          <h3>Протестируйте значения</h3>
           <label htmlFor="text">
             <input
               type="checkbox"
@@ -373,7 +389,7 @@ function DrawAdditionalFields(props) {
               ref={setText}
               className="w3-check"
             />
-            Text
+            Текст
           </label>
           <label htmlFor="size">
             <input
@@ -382,7 +398,7 @@ function DrawAdditionalFields(props) {
               ref={setSize}
               className="w3-check"
             />
-            Size
+            Размер
           </label>
           <label htmlFor="classes">
             <input
@@ -391,20 +407,17 @@ function DrawAdditionalFields(props) {
               ref={setClasses}
               className="w3-check"
             />
-            Classes
+            Классы
           </label>
           {/* <label htmlFor="attribute">
             <input type="checkbox" name="attribute" className="w3-check"/>
             Attribute
           </label> */}
-          <p>
-            pick the characteristics, that you want to be tested, then pick an
-            element by your cursor
-          </p>
+          <p>Выберите характеристики, которые необходимо протестировать</p>
         </div>
       );
     }
     default:
-      return <h3>Select mode please</h3>;
+      return <h3>Выберите режим работы</h3>;
   }
 }

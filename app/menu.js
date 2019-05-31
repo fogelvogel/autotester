@@ -16,6 +16,8 @@ export default class MenuBuilder {
 
   showAllWindow: BrowserWindow;
 
+  settingsWindow: BrowserWindow;
+
   dialog = dialog;
 
   openFile() {
@@ -72,16 +74,24 @@ export default class MenuBuilder {
     this.showAllWindow.loadURL(`file://${__dirname}/findTests.html`);
   }
 
+  settings() {
+    this.settingsWindow.loadURL(`file://${__dirname}/findTests.html`);
+  }
+
   constructor(
     mainWindow: BrowserWindow,
     toolsWindow: BrowserWindow,
+    settingsWindow: BrowserWindow,
     showAllWindow: BrowserWindow
   ) {
     this.mainWindow = mainWindow;
     this.toolsWindow = toolsWindow;
     this.showAllWindow = showAllWindow;
+    this.settingsWindow = settingsWindow;
     this.showAll = this.showAll.bind(this);
+    this.saveFile = this.saveFile.bind(this);
     ipcMain.on('show all tests in window', this.showAll);
+    ipcMain.on('saving-as-first', this.saveFile);
   }
 
   buildMenu() {
@@ -152,10 +162,10 @@ export default class MenuBuilder {
       ]
     };
     const subMenuFile = {
-      label: 'File',
+      label: 'Файл',
       submenu: [
         {
-          label: 'Open',
+          label: 'Открыть',
           accelerator: 'Command+O',
           selector: 'open:',
           click: () => {
@@ -163,7 +173,7 @@ export default class MenuBuilder {
           }
         },
         {
-          label: 'Save',
+          label: 'Сохранить',
           accelerator: 'Command+S',
           selector: 'save:',
           click: () => {
@@ -171,7 +181,7 @@ export default class MenuBuilder {
           }
         },
         {
-          label: 'Save as',
+          label: 'Сохранить как',
           accelerator: 'Shift+Command+S',
           selector: 'saveAs:',
           click: () => {
@@ -179,32 +189,47 @@ export default class MenuBuilder {
           }
         },
         {
-          label: 'Show all',
+          label: 'Показать все тесты',
           selector: 'showAll:',
           click: () => {
             this.showAll();
+          }
+        },
+        {
+          label: 'Открыть настройки',
+          selector: 'settings:',
+          click: () => {
+            this.settings();
           }
         }
       ]
     };
     const subMenuEdit = {
-      label: 'Edit',
+      label: 'Редактировать',
       submenu: [
-        { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
-        { label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
-        { type: 'separator' },
-        { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
-        { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
-        { label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
         {
-          label: 'Select All',
+          label: 'Отменить действие',
+          accelerator: 'Command+Z',
+          selector: 'undo:'
+        },
+        {
+          label: 'Восстановить действие',
+          accelerator: 'Shift+Command+Z',
+          selector: 'redo:'
+        },
+        { type: 'separator' },
+        { label: 'Вырезать', accelerator: 'Command+X', selector: 'cut:' },
+        { label: 'Копировать', accelerator: 'Command+C', selector: 'copy:' },
+        { label: 'Вставить', accelerator: 'Command+V', selector: 'paste:' },
+        {
+          label: 'Выбрать все',
           accelerator: 'Command+A',
           selector: 'selectAll:'
         }
       ]
     };
     const subMenuViewDev = {
-      label: 'View',
+      label: 'Вид',
       submenu: [
         {
           label: 'Reload',
@@ -214,19 +239,20 @@ export default class MenuBuilder {
           }
         },
         {
-          label: 'Toggle Full Screen',
+          label: 'Полноэкранный режим',
           accelerator: 'Ctrl+Command+F',
           click: () => {
             this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
           }
         },
         {
-          label: 'Toggle Developer Tools',
+          label: 'Инструменты разработчика',
           accelerator: 'Alt+Command+I',
           click: () => {
             this.mainWindow.toggleDevTools();
             this.toolsWindow.toggleDevTools();
             this.showAllWindow.toggleDevTools();
+            this.settingsWindow.toggleDevTools();
           }
         }
       ]
@@ -244,20 +270,24 @@ export default class MenuBuilder {
     //   ]
     // };
     const subMenuWindow = {
-      label: 'Window',
+      label: 'Окно',
       submenu: [
         {
-          label: 'Minimize',
+          label: 'Свернуть',
           accelerator: 'Command+M',
           selector: 'performMiniaturize:'
         },
-        { label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
+        {
+          label: 'Закрыть',
+          accelerator: 'Command+W',
+          selector: 'performClose:'
+        },
         { type: 'separator' },
         { label: 'Bring All to Front', selector: 'arrangeInFront:' }
       ]
     };
     const subMenuHelp = {
-      label: 'Help',
+      label: 'Помощь',
       submenu: [
         {
           label: 'Learn More',
@@ -304,40 +334,45 @@ export default class MenuBuilder {
   buildDefaultTemplate() {
     const templateDefault = [
       {
-        label: '&File',
+        label: '&Файл',
         submenu: [
           {
-            label: '&Open',
+            label: '&Открыть',
             accelerator: 'Ctrl+O',
             click: () => this.openFile()
           },
           {
-            label: '&Save',
+            label: '&Сохранить',
             accelerator: 'Ctrl+S',
             click: () => this.save()
           },
           {
-            label: '&SaveAs',
+            label: '&Сохранить как',
             accelerator: 'Shift+Ctrl+S',
             click: () => this.saveFile()
           },
           {
-            label: '&ShowAll',
+            label: '&Показать все тесты',
             click: () => this.showAll()
           },
           {
-            label: '&Close',
+            label: '&Показать настройки',
+            click: () => this.settings()
+          },
+          {
+            label: '&Закрыть',
             accelerator: 'Ctrl+W',
             click: () => {
               this.mainWindow.close();
               this.toolsWindow.close();
               this.showAllWindow.close();
+              this.settingsWindow.close();
             }
           }
         ]
       },
       {
-        label: '&View',
+        label: '&Вид',
         submenu:
           process.env.NODE_ENV === 'development'
             ? [
@@ -378,16 +413,16 @@ export default class MenuBuilder {
               ]
       },
       {
-        label: 'Help',
+        label: 'Помощь',
         submenu: [
           {
-            label: 'Learn More',
+            label: 'Узнать больше',
             click() {
               shell.openExternal('http://electron.atom.io');
             }
           },
           {
-            label: 'Documentation',
+            label: 'Документация',
             click() {
               shell.openExternal(
                 'https://github.com/atom/electron/tree/master/docs#readme'
@@ -395,15 +430,9 @@ export default class MenuBuilder {
             }
           },
           {
-            label: 'Community Discussions',
+            label: 'Обсуждение сообществом',
             click() {
               shell.openExternal('https://discuss.atom.io/c/electron');
-            }
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/atom/electron/issues');
             }
           }
         ]

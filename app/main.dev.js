@@ -21,8 +21,11 @@ let toolsWindow = null;
 // в этом окне вы можете посмотреть все написанные тесты
 let showAllWindow = null;
 
+// в этом окне изменяются настройки приложения
+let settingsWindow = null;
+
 // глобальная переменная хранит полное имя текущего открытого файла
-global.savingName = { name: path.join(__dirname, `/tmp/test1`) };
+global.savingName = { name: path.join(__dirname, `/tmp/#`) };
 
 // global.lastTestedPages = [
 //   'rtretrtawt',
@@ -353,6 +356,21 @@ test('${testName[0]}', async () => {
 }
 // тестируемая страница загружается в главное окно
 function loadTestingPage(event, args) {
+  toolsWindow.webContents.send();
+  let newPath;
+  if (args === null || args === '') {
+    newPath = `file://${path.join(
+      __dirname,
+      `../../autotest-runner/App/demo.html`
+    )}`;
+    mainWindow.loadURL(newPath);
+  } else {
+    mainWindow.loadURL(args);
+    currentURL = args;
+  }
+}
+function loadFirstTestingPage(event, args) {
+  // toolsWindow.webContents.send();
   let newPath;
   if (args === null || args === '') {
     newPath = `file://${path.join(
@@ -366,10 +384,14 @@ function loadTestingPage(event, args) {
     newPath = args;
   }
   const newSavePaths = [...global.lastTestedPages];
-  newSavePaths.unshift(newPath);
-  newSavePaths.pop();
-  global.lastTestedPages = [...newSavePaths];
-  console.log(global.lastTestedPages);
+  const isPathInList = newSavePaths.includes(newPath);
+  if (!isPathInList) {
+    newSavePaths.unshift(newPath);
+    newSavePaths.pop();
+    global.lastTestedPages = [...newSavePaths];
+
+    writeSettings();
+  }
 }
 // функция стчитывает тестовые файлы и отправляет их в окно файлов
 function readDirectory() {
@@ -395,10 +417,11 @@ function writeSettings() {
   fs.readFile(filePath, 'utf-8', (err, data) => {
     newData = JSON.parse(data);
     newData.visited = [...global.lastTestedPages];
-    console.log(newData);
-  });
-  fs.writeFile(filePath, JSON.stringify(newData), err => {
-    if (err) console.log(err);
+    fs.writeFile(filePath, JSON.stringify(newData), errWrite => {
+      if (errWrite) {
+        console.log(err);
+      }
+    });
   });
 }
 
@@ -445,8 +468,8 @@ function deleteAllFiles(event, args) {
   // окошко подтверждения удаления всех тестов
   dialog.showMessageBox(
     {
-      message: 'Do you want to delete all test files?',
-      buttons: ['Ok', 'Cancel']
+      message: 'Вы хотите удалить все тесты?',
+      buttons: ['Ок', 'Отмена']
     },
     button => {
       // если нажата "Ок"
@@ -481,23 +504,23 @@ function convertAllFiles() {
     let mess;
 
     if (quantity !== null && quantity !== 0) {
-      mess = 'All tests were converted';
+      mess = 'Все тесты сконвертировались';
     } else {
-      mess = 'No tests were converted';
+      mess = 'Тесты не сконвертированы';
     }
 
     dialog.showMessageBox({
       message: mess,
-      buttons: ['Ok']
+      buttons: ['Ок']
     });
   });
 }
 
 app.on('window-all-closed', () => {
-  writeSettings();
   mainWindow = null;
   toolsWindow = null;
   showAllWindow = null;
+  settingsWindow = null;
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -529,6 +552,11 @@ app.on('ready', async () => {
     width: 469,
     height: 665
   });
+  settingsWindow = new BrowserWindow({
+    show: false,
+    width: 469,
+    height: 665
+  });
   readSettings();
   toolsWindow.loadURL(`file://${__dirname}/tools.html`);
   // после того как загрузится окно с инструментами
@@ -542,7 +570,12 @@ app.on('ready', async () => {
     toolsWindow.focus();
     toolsWindow.toggleDevTools();
 
-    const menuBuilder = new MenuBuilder(mainWindow, toolsWindow, showAllWindow);
+    const menuBuilder = new MenuBuilder(
+      mainWindow,
+      toolsWindow,
+      showAllWindow,
+      settingsWindow
+    );
     const menu = menuBuilder.buildMenu();
     Menu.setApplicationMenu(menu);
   });
@@ -557,6 +590,15 @@ app.on('ready', async () => {
     showAllWindow.focus();
     showAllWindow.toggleDevTools();
     readDirectory();
+  });
+
+  settingsWindow.webContents.on('did-finish-load', () => {
+    if (!settingsWindow) {
+      throw new Error('"settingsWindow" is not defined');
+    }
+    settingsWindow.show();
+    settingsWindow.focus();
+    settingsWindow.toggleDevTools();
   });
 
   // после того как тест.страница загрузится
@@ -607,6 +649,8 @@ app.on('ready', async () => {
   ipcMain.on('keyup', keyupFunction);
   // загрузка url тест. страницы
   ipcMain.on('new-url-event', loadTestingPage);
+  // загрузка url тест. страницы с которой начинается тестирование
+  ipcMain.on('first-url-event', loadFirstTestingPage);
   // сохранить открытый тест
   ipcMain.on('save-test', saveTest);
   // тест. стр. скролится
