@@ -96,9 +96,14 @@ function makeTestingString(attribute, paths) {
 
   switch (attrib[0]) {
     case 'text': {
-      return `expect(await app.client.getText('${paths}')).toEqual('${replaceNBSPs(
-        attrib[1]
-      ).trim()}');\n`;
+      // eslint-disable-next-line prefer-template
+      return (
+        'expect(await app.client.getText(' +
+        paths +
+        ')).toEqual(`' +
+        replaceNBSPs(attrib[1]).trim() +
+        '`);\n'
+      );
     }
     case 'size': {
       return `expect(await app.client.getElementSize('${paths}')).toEqual({height: ${
@@ -262,8 +267,9 @@ function saveTest(event, args) {
 // конвертировать текущий открытый тест
 // в аргументах - строки теста
 function saveConvertedTest(args) {
-  const fileNames = global.savingName.name.split('/');
+  const fileNames = global.savingName.name.split('\\');
   const last = fileNames.pop();
+
   const convertStream = fs.createWriteStream(
     path.join(__dirname, `../../autotest-runner/__tests__/${last}-converted.js`)
   );
