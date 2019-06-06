@@ -57,10 +57,6 @@ export default class MenuBuilder {
           const index = 0;
           global.savingName.name = name[index];
           this.toolsWindow.webContents.send('need to save as', fileName);
-          //   global.savingName.name = ;
-          //     fs.writeFile(fileName, 'dadasd', (err) => {
-          //     if (err !== null) console.log('file was not written', err);
-          //   })
         }
       }
     );
